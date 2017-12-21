@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ws_operation">
+    <sys_ws_operation action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <consumes>application/json</consumes>
+        <consumes_customized>false</consumes_customized>
+        <default_operation_uri>/api/x_166541_ibm_resil/resilient_notification/createcomment</default_operation_uri>
+        <enforce_acl/>
+        <http_method>POST</http_method>
+        <name>Create Comment</name>
+        <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+	var requestData = request.body.data;
+	gs.eventQueue("x_166541_ibm_resil.resilient_note", null, requestData, "comment");
+		
+	})(request, response);]]></operation_script>
+        <operation_uri>/api/x_166541_ibm_resil/v1/resilient_notification/createcomment</operation_uri>
+        <produces>application/json</produces>
+        <produces_customized>false</produces_customized>
+        <relative_path>/createcomment</relative_path>
+        <request_example>{&#13;
+    "properties": {&#13;
+        "property1": "value1",&#13;
+        "property2": "value2"&#13;
+    },&#13;
+    "sysid": 1234567,&#13;
+    "incidentid": 12345,&#13;
+    "taskid": 12345,&#13;
+    "artifactid": 12345,&#13;
+    "noteid": 12345,&#13;
+    "datatableid: "table_name",&#13;
+    "rowid": 12345&#13;
+}</request_example>
+        <requires_acl_authorization>false</requires_acl_authorization>
+        <requires_authentication>true</requires_authentication>
+        <short_description>Request from Resilient to Create Comment in ServiceNow</short_description>
+        <sys_class_name>sys_ws_operation</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-12-01 16:08:13</sys_created_on>
+        <sys_id>8e2dbb450fb60300bc87ba8ce1050e9b</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>Create Comment</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>sys_ws_operation_8e2dbb450fb60300bc87ba8ce1050e9b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-12-01 21:10:17</sys_updated_on>
+        <web_service_definition display_value="Resilient Notification">19e733c10fb60300bc87ba8ce1050e33</web_service_definition>
+        <web_service_version display_value="v1">ce483f850ff20300bc87ba8ce1050e3a</web_service_version>
+    </sys_ws_operation>
+</record_update>

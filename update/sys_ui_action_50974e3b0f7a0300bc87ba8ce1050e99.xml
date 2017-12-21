@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update sys_domain="global" table="sys_ui_action">
+    <sys_ui_action action="INSERT_OR_UPDATE">
+        <action_name>create_resilient_task</action_name>
+        <active>true</active>
+        <client>true</client>
+        <comments>Create a task in IBM Resilient IRP</comments>
+        <condition/>
+        <form_action>true</form_action>
+        <form_button>false</form_button>
+        <form_context_menu>false</form_context_menu>
+        <form_link>true</form_link>
+        <form_style/>
+        <hint/>
+        <list_action>true</list_action>
+        <list_banner_button>false</list_banner_button>
+        <list_button>false</list_button>
+        <list_choice>true</list_choice>
+        <list_context_menu>true</list_context_menu>
+        <list_link>true</list_link>
+        <list_save_with_form_button>false</list_save_with_form_button>
+        <list_style/>
+        <name>Create Resilient Task</name>
+        <onclick>getIncidentID()</onclick>
+        <order>100</order>
+        <script><![CDATA[//Client-side 'onclick' function
+function getIncidentID(){
+	//Create and open the dialog form
+
+	var lastIncID = getPreference('resilient_incident_id'); 
+
+	var incID = prompt("Enter Resilient Incident ID to add task to:", lastIncID);
+	if (incID){
+		if (lastIncID != incID){
+			setPreference('resilient_incident_id', incID); 
+		}
+		//Call the UI Action and skip the 'onclick' function
+		gsftSubmit(null, g_form.getFormElement(), 'create_resilient_task');
+	}
+}
+
+//Code that runs without 'onclick'
+//Ensure call to server-side function with no browser errors
+if(typeof window == 'undefined')
+	createTask();
+
+function createTask() {
+	var incID = gs.getUser().getPreference("resilient_incident_id");
+	var creator;
+	try{
+		creator = new ResilientCreator();
+	}
+	catch (ex) {
+		if (ex instanceof ReferenceError) {
+			// no custom mapping defined, use default
+			try{
+				creator = new ResilientDefaultCreator();
+			}
+			catch (ex){
+				gs.addInfoMessage("Failed to Create Resilient Task");
+				throw ex;
+			}
+		} else {
+			gs.addInfoMessage("Failed to Create Resilient Task");
+			throw ex;
+		}
+	}
+	
+	var task = creator.createTask(incID, current);
+	gs.addInfoMessage("Task " + task.id + " created on Resilient Incident " + incID);
+	action.setRedirectURL(current);
+}]]></script>
+        <show_insert>false</show_insert>
+        <show_multiple_update>false</show_multiple_update>
+        <show_query>false</show_query>
+        <show_update>true</show_update>
+        <sys_class_name>sys_ui_action</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-12-09 21:03:12</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>50974e3b0f7a0300bc87ba8ce1050e99</sys_id>
+        <sys_mod_count>10</sys_mod_count>
+        <sys_name>Create Resilient Task</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>sys_ui_action_50974e3b0f7a0300bc87ba8ce1050e99</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-12-09 22:11:02</sys_updated_on>
+        <table>incident</table>
+        <ui11_compatible>true</ui11_compatible>
+        <ui16_compatible>true</ui16_compatible>
+    </sys_ui_action>
+</record_update>

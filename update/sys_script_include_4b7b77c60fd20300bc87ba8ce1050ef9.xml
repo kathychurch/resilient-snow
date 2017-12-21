@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_166541_ibm_resil.ResilientAPI</api_name>
+        <client_callable>false</client_callable>
+        <description>Wrapper for Resilient REST API</description>
+        <name>ResilientAPI</name>
+        <script><![CDATA[var ResilientAPI = Class.create();
+ResilientAPI.prototype = {
+	initialize: function() {
+		this._csrfToken=null;
+		this._jSessionID=null;
+		this._parser=null;
+		this.baseURL=null;
+		this.orgID=null;
+		this.userID=null;
+		this.midServer=null;
+		
+		this._connect();
+	},
+	
+	type: 'ResilientAPI',
+	
+	_connect: function(){
+		var status;
+		var errorMsg;
+		var responseBody;
+		var org;
+		var user;
+		this._parser = new global.JSON();
+		try {
+			this.baseURL = "https://" + gs.getProperty("x_166541_ibm_resil.ResilientHost");
+			org = gs.getProperty("x_166541_ibm_resil.ResilientOrg");
+			user = gs.getProperty("x_166541_ibm_resil.ResilientUsername");
+			var password = gs.getProperty("x_166541_ibm_resil.ResilientPassword");
+			
+			var authData = {
+				"email": user,
+				"password": password
+			};
+			
+			var rm = new sn_ws.RESTMessageV2();
+			rm.setHttpMethod("post");
+			rm.setEndpoint(this.baseURL +"/rest/session");
+			var requestBody = this._parser.encode(authData);
+			rm.setRequestBody(requestBody);
+			rm.setRequestHeader("content-type", "application/json");
+			
+			//Check if using MID Server is configured for Resilient Access
+			var capability;
+			var gr = new GlideRecord('ecc_agent_capability_m2m');
+			gr.addQuery("capability.capability", "ResilientAccess");
+			gr.query();
+			while(gr.next()) {
+				if(gr.agent.status == "Up") {
+					capability = gr.capability.getDisplayValue();
+					this.midServer = gr.agent.name;
+					break;
+				}
+			}
+			if (this.midServer){
+				rm.setMIDServer(this.midServer);
+				//TODO:  Do we need to call rm.setEccCorrelator(uniqueIDString)  ?
+			}
+			var response = rm.execute();
+			var endpoint = rm.getEndpoint();
+			status = response.getStatusCode();
+			responseBody = response.getBody();
+			if (responseBody){
+				responseBody = this._parser.decode(responseBody);
+			}
+			errorMsg = response.haveError() ? response.getErrorMessage() : '';
+			if (errorMsg && responseBody){
+				errorMsg = errorMsg + ": " + responseBody.message;
+			}
+			if (!errorMsg){
+				this._csrfToken = responseBody.csrf_token;
+				var cookie = response.getHeader("Set-Cookie");
+				var start = cookie.indexOf("JSESSIONID=");
+				var end = cookie.indexOf(";", start);
+				this._jSessionID = cookie.slice(start + 11, end);
+				var tokens = this._csrfToken + "  --  " + this._jSessionID;
+				var headers = response.getAllHeaders();
+				this.userID = responseBody.user_id;
+			}
+		}
+		catch (ex) {
+			errorMsg = ex;
+		}
+		
+		if (errorMsg){
+			errorMsg = 'Failed to establish Resilient session (status ' + status + '): ' + errorMsg;
+			gs.addInfoMessage(errorMsg);
+			throw errorMsg;
+		}
+		
+		try {
+			var orgs = responseBody.orgs;
+			for (i = 0; i < orgs.length; i++){
+				if (orgs[i].name === org){
+					this.orgID = orgs[i].id;
+					if (!orgs[i].enabled){
+						errorMsg = "Specified org is not accessible to you.";
+					}
+					break;
+				}
+			}
+			if (!this.orgID){
+				errorMsg = "Resilient user is not a member of specified org.";
+			}
+		}
+		catch (ex) {
+			errorMsg = ex;
+		}
+		if (errorMsg){
+			errorMsg = 'Resilient Connection Failed: ' + errorMsg;
+			gs.addInfoMessage(errorMsg);
+			throw errorMsg;
+		}
+		
+		return true;
+	},
+	
+	request: function(method, endpoint, data, additionalHeaders){
+		// additionalHeaders is optional
+		var errorMsg;
+		var status;
+		var responseBody;
+		var url = this.baseURL +"/rest" + endpoint;
+		
+		try {
+			var rm = new sn_ws.RESTMessageV2();
+			if (this.midServer){
+				rm.setMIDServer(this.midServer);
+			}
+			rm.setHttpMethod(method);
+			rm.setEndpoint(url);
+			rm.setRequestHeader("content-type", "application/json");
+			rm.setRequestHeader("X-sess-id", this._csrfToken);
+			rm.setRequestHeader("Cookie", "JSESSIONID=" + this._jSessionID+";");
+			if (additionalHeaders){
+				for (var header in additionalHeaders){
+					if (!additionalHeaders.hasOwnProperty(header)) continue;
+						rm.setRequestHeader(header, additionalHeaders[header]);
+				}
+			}
+			if (data){
+				var requestBody = this._parser.encode(data);
+				rm.setRequestBody(requestBody);
+			}
+			
+			var response = rm.execute();
+			status = response.getStatusCode();
+			if (status == 401){
+				// Unauthorized, Re-authenticate and try again
+				this._connect();
+				rm.setRequestHeader("X-sess-id", this._csrfToken);
+				rm.setRequestHeader("Cookie", "JSESSIONID=" + this._jSessionID+";");
+				response = rm.execute();
+				status = response.getStatusCode();
+			}
+			responseBody = response.getBody();
+			if (responseBody){
+				responseBody = this._parser.decode(responseBody);
+			}
+			errorMsg = response.haveError() ? response.getErrorMessage() : '';
+			if (errorMsg && responseBody){
+				errorMsg = errorMsg + ": " + responseBody.message;
+			}
+		}
+		catch (ex) {
+			errorMsg = ex;
+		}
+		if (errorMsg){
+			errorMsg = 'Resilient ' + method + ' Request Failed (' + url + '): ' + status + ' ' + errorMsg;
+			gs.addInfoMessage(errorMsg);
+			throw errorMsg;
+		}
+		return responseBody;
+	},
+	
+	getIncident: function(incID){
+		var endpoint = "/orgs/" + this.orgID + "/incidents/" + incID;
+		var headers = {
+			"handle_format": "names"
+		};
+		return this.request("get", endpoint, null, headers);
+	},
+	
+	createIncident: function(incData){
+		var endpoint = "/orgs/" + this.orgID + "/incidents";
+		var headers = {
+			"handle_format": "names"
+		};
+		return this.request("post", endpoint, incData,	headers);
+	},
+	
+	_getChanges: function(currentObject, updates){
+		var changes = [];
+		for (var field in updates){
+			if (!updates.hasOwnProperty(field)) {
+				continue;
+			}
+			else {
+				change = {"field": field,
+					"old_value": currentObject[field] === 'undefined' ? null : currentObject[field],
+					"new_value": updates[field]
+				};
+				changes.push(change);
+			}
+		}
+		return changes;
+	},
+	
+	updateIncident: function(incident, updates){
+		// incident is an incident object. updates is a subset of it
+		var endpoint = "/orgs/" + this.orgID + "/incidents/" + incident.id;
+		var prevVers = incident.vers;
+		var headers = {
+			"handle_format": "names"
+		};
+		var patchData = {
+			"changes": [],
+			"version": prevVers
+		};
+		
+		var changes = this._getChanges(incident, updates);
+		patchData.changes = changes;
+		return this.request("patch", endpoint, patchData, headers);
+	},
+	
+	getTask: function(taskID){
+		var endpoint = "/orgs/" + this.orgID + "/tasks/" + taskID;
+		var headers = {
+			"handle_format": "names"
+		};
+		return this.request("get", endpoint, null, headers);
+	},
+	
+	createTask: function(incID, taskData){
+		var endpoint = "/orgs/" + this.orgID + "/incidents/" + incID + "/tasks";
+		var headers = {
+			"handle_format": "names"
+		};
+		return this.request("post", endpoint, taskData, headers);
+	},
+	
+	updateTask: function(task){
+		// existing task with updates made
+		var endpoint = "/orgs/" + this.orgID + "/tasks/" + task.id;
+		var headers = {
+			"handle_format": "names"
+		};
+		
+		return this.request("patch", endpoint, task, headers);
+	},
+	
+	createIncidentNote: function(incID, text){
+		var endpoint = "/orgs/" + this.orgID + "/incidents/" + incID + "/comments";
+		var headers = {
+			"handle_format": "names"
+		};
+		var note = {
+			"text": text
+		};
+		return this.request("post", endpoint, note, headers);
+	},
+	
+	createTaskNote: function(taskID, text){
+		var endpoint = "/orgs/" + this.orgID + "/tasks/" + taskID + "/comments";
+		var headers = {
+			"handle_format": "names"
+		};
+		var note = {
+			"text": text
+		};
+		return this.request("post", endpoint, note, headers);
+	},
+	
+	createArtifact: function(incID, artifactType, value, description, properties){
+		//description and properties are optional
+		var endpoint = "/orgs/" + this.orgID + "/incidents/" + incID + "/artifacts";
+		var headers = {
+			"handle_format": "names"
+		};
+		var artifactData = {
+			"value": value,
+			"type": artifactType
+		};
+		if (description) {
+			artifactData.description = description;
+		}
+		if (properties) {
+			var propertiesList = [];
+			var property;
+			for (var propertyName in properties) {
+				property = {
+					"name": propertyName,
+					"value": properties[propertyName]
+				};
+				propertiesList.push(property);
+			}
+			artifactData.properties = propertiesList;
+		}
+		return this.request("post", endpoint, artifactData, headers);
+	},
+	
+	addDataTableRow: function(incID, tableName, row){
+		//curlybrace col1:val, col2:val curlybrace
+		var endpoint = "/orgs/" + this.orgID + "/incidents/" + incID + "/table_data/" +  tableName + "/row_data";
+		var headers = {
+			"handle_format": "names"
+		};
+		var cells = {
+			
+		};
+		for (var col in row){
+			cells[col] = {
+				"value": row[col]
+			};
+		}
+		var rowData = {
+			"cells": cells
+		};
+		return this.request("post", endpoint, rowData, headers);
+	},
+	
+	updateDataTableRow: function(incID, tableName, row, updates){
+		//row is an existing table row
+		//curlybrace col1:val, col2:val curlybrace
+		var endpoint = "/orgs/" + this.orgID + "/incidents/" + incID + "/table_data/" +  tableName + "/row_data/" + row.id;
+		var headers = {
+			"handle_format": "names"
+		};
+		
+		for (var col in updates){
+			row.cells[col].value = updates[col];
+		}
+		
+		return this.request("put", endpoint, row, headers);
+	},
+	
+	deleteDataTableRow: function(incID, rowID){
+		var endpoint = "/orgs/" + this.orgID + "/incidents/" + incID + "/table_data/" +  tableName + "/row_data/" + row.id;
+		
+		return this.request("delete", endpoint);
+	},
+	
+	getDataTableRows: function(incID, tableName, matchCriteria){
+		// matchCriteria optional, if missing all rows returned
+		//curlybrace col1:value, col2:value,... curlybrace
+		var endpoint;
+		if (matchCriteria){
+			var queryPieces = [];
+			endpoint = "/orgs/" + this.orgID + "/types/" + tableName;
+			var tableInfo = this.request("get", endpoint);
+			var fieldID;
+			for (var fieldname in matchCriteria){
+				// Get ID for field
+				fieldID = tableInfo.fields[fieldname].id;
+				query = "datatable." + fieldID + "." + fieldname + ": " + matchCriteria[fieldname];
+				queryPieces.push(query);
+			}
+			var completeQuery = queryPieces.join(" AND ");
+			var searchJSON = {
+				"org_id": this.orgID,
+				"query": completeQuery,
+				"types": ["datatable"],
+				"filters": {
+					"incident": [
+					{
+						"conditions": [
+						{
+							"field_name": "id",
+							"method": "equals",
+							"value": incID
+						}
+						]
+					}
+					]
+				}
+			};
+			endpoint = "/search_ex";
+			response = this.request("post", endpoint, searchJSON);
+			if (response.results){
+				// handle_format=names doesn't work on search_ex
+				// we must manually swap the ID values for names
+				var rows = [];
+				var result, row;
+				var tableInfoInverse = {};
+					for (fieldname in tableInfo.fields){
+						tableInfoInverse[tableInfo.fields[fieldname].id] = tableInfo.fields[fieldname];
+					}
+					for (var resultIndex in response.results){
+						row = response.results[resultIndex].result;
+						for (fieldID in row.cells){
+							fieldname = tableInfoInverse[fieldID].name;
+							row.cells[fieldname] = row.cells[fieldID];
+							delete row.cells[fieldID];
+						}
+						rows.push(row);
+					}
+					return rows;
+				}
+				else{
+					return [];
+				}
+			}
+			else{
+				// Just get all the rows
+				endpoint = "/orgs/" + this.orgID + "/incidents/" + incID + "/table_data/" +  tableName;
+				response = this.request("get", endpoint);
+				if (response.rows){
+					return response.rows;
+				}
+				else{
+					return [];
+				}
+			}
+		},
+		
+		postAttachment: function(incID, filename){
+			// TODO:
+		},
+		
+		getAttachment: function(incID, filename){
+			// TODO:
+		}
+	};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-11-09 22:03:25</sys_created_on>
+        <sys_id>4b7b77c60fd20300bc87ba8ce1050ef9</sys_id>
+        <sys_mod_count>88</sys_mod_count>
+        <sys_name>ResilientAPI</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>sys_script_include_4b7b77c60fd20300bc87ba8ce1050ef9</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-12-10 01:00:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

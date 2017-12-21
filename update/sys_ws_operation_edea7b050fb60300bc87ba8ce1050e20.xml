@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ws_operation">
+    <sys_ws_operation action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <consumes>application/json</consumes>
+        <consumes_customized>false</consumes_customized>
+        <default_operation_uri>/api/x_166541_ibm_resil/resilient_notification/createticket</default_operation_uri>
+        <enforce_acl/>
+        <http_method>POST</http_method>
+        <name>Create Ticket</name>
+        <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+	var message = request.body.data;
+	var handler;
+	try {
+		handler = new ResilientHandler();
+	}
+	catch (ex) {
+		if (ex instanceof ReferenceError) {
+			// no custom handler defined, use default
+			try{
+				handler = new ResilientDefaultHandler();
+			}
+			catch (ex) {
+				errorMsg = "Couldn't instantiate ResilientDefaultHandler" + ": " + ex.toString();
+			}
+		} else {
+			errorMsg = "Couldn't instantiate custom ResilientHandler" + ": " + ex.toString();
+		}
+	}
+			
+	try{
+		result = handler.create(message);
+		if (typeof result === "string"){
+			// an error message
+			response.setStatus(400);
+			result = {
+				"message": "Failed to create ticket. " + result
+			};
+		}
+		else{
+			response.setStatus(201);
+		}
+	}
+	catch (ex){
+		response.setStatus(500);
+		result = {
+			"message": "Failed to create ticket. " + ex.toString()
+		};
+	}
+	response.setBody(result);
+})(request, response);]]></operation_script>
+        <operation_uri>/api/x_166541_ibm_resil/v1/resilient_notification/createticket</operation_uri>
+        <produces>application/json</produces>
+        <produces_customized>false</produces_customized>
+        <relative_path>/createticket</relative_path>
+        <request_example>Resilient Action Module Message</request_example>
+        <requires_acl_authorization>false</requires_acl_authorization>
+        <requires_authentication>true</requires_authentication>
+        <short_description>Request from Resilient to Create Ticket in ServiceNow</short_description>
+        <sys_class_name>sys_ws_operation</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-12-01 16:01:54</sys_created_on>
+        <sys_id>edea7b050fb60300bc87ba8ce1050e20</sys_id>
+        <sys_mod_count>17</sys_mod_count>
+        <sys_name>Create Ticket</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>sys_ws_operation_edea7b050fb60300bc87ba8ce1050e20</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-12-09 20:30:45</sys_updated_on>
+        <web_service_definition display_value="Resilient Notification">19e733c10fb60300bc87ba8ce1050e33</web_service_definition>
+        <web_service_version display_value="v1">ce483f850ff20300bc87ba8ce1050e3a</web_service_version>
+    </sys_ws_operation>
+</record_update>

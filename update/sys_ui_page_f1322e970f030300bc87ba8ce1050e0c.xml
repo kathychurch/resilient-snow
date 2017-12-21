@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script><![CDATA[function doTest() {
+	gel('button_clicked').value = "test";
+	return true;
+}
+
+function doConfig() {
+	gel('button_clicked').value = "config";
+	return true;
+}]]></client_script>
+        <description>Some Resilient Tools</description>
+        <direct>false</direct>
+        <endpoint>x_166541_ibm_resil_resilient_utilities.do</endpoint>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+	<img align="baseline" alt="" src="resilient.png" border="" hspace=""  style="align: baseline;" title="" vspace="" width="300" data-original-title=""/>
+	<div style="white-space:pre-line"/>
+	<g:ui_form>
+		<input type="hidden" id="button_clicked" name="button_clicked"/>
+		<h3>Test Resilient Connection Properties.</h3>
+		<button class="btn btn-primary" type="submit" name="testconn" onclick="doTest()">${gs.getMessage("Test Connection")}</button>
+		<div style="white-space:pre-line"/>
+		<h3>Auto-Configure Resilient</h3>
+		<button class="btn btn-primary" type="submit" name="configure" onclick="doConfig()">${gs.getMessage("Configure")}</button>
+	</g:ui_form>
+																	
+</j:jelly>]]></html>
+        <name>resilient_utilities</name>
+        <processing_script><![CDATA[try {
+	var action = button_clicked;
+	var resilientClient = new ResilientAPI();
+	if(action === "test"){
+		gs.addInfoMessage("Connection Test Successful!");
+	}
+	else if(action==="config"){
+		//TODO: Create Resilient Data Table
+		createTable(resilientClient);
+		gs.addInfoMessage("Resilient Configured Successfully!");
+	}
+}
+catch (ex){
+	if(action === "test"){
+		gs.addErrorMessage("Connection Test Failed!");
+	}
+	else if(action==="config"){
+		gs.addErrorMessage("Resilient Configuration Failed!");
+	}
+}
+
+function createTable(client){
+	var dataToPost = {
+		"fields": {
+			"snow_resilient_task_id": {
+				"name": "snow_resilient_task_id",
+				"text": "Resilient Task ID",
+				"tooltip": "",
+				"placeholder": "",
+				"input_type": "text",
+				"blank_option": false,
+				"read_only": false,
+				"rich_text": false,
+				"order": 0,
+				"width": 154
+			},
+			"snow_table_name": {
+				"name": "snow_table_name",
+				"text": "Table Name",
+				"tooltip": "",
+				"placeholder": "",
+				"input_type": "text",
+				"blank_option": false,
+				"read_only": false,
+				"rich_text": false,
+				"order": 5,
+				"width": 31
+			},
+			"snow_status": {
+				"name": "snow_status",
+				"text": "Status",
+				"tooltip": "",
+				"placeholder": "",
+				"input_type": "text",
+				"blank_option": true,
+				"read_only": false,
+				"rich_text": false,
+				"order": 3,
+				"width": 116
+			},
+			"snow_ticket_sys_id": {
+				"name": "snow_ticket_sys_id",
+				"text": "SYS_ID",
+				"tooltip": "",
+				"placeholder": "",
+				"input_type": "text",
+				"blank_option": true,
+				"read_only": false,
+				"rich_text": false,
+				"order": 4,
+				"width": 116
+			},
+			"snow_ticket_number": {
+				"name": "snow_ticket_number",
+				"text": "Ticket Number",
+				"tooltip": "",
+				"placeholder": "",
+				"input_type": "text",
+				"blank_option": true,
+				"read_only": false,
+				"rich_text": false,
+				"order": 1,
+				"width": 139
+			},
+			"snow_short_description": {
+				"name": "snow_short_description",
+				"text": "Name",
+				"tooltip": "",
+				"placeholder": "",
+				"input_type": "text",
+				"blank_option": true,
+				"read_only": false,
+				"rich_text": false,
+				"order": 2,
+				"width": 116
+			}
+		},
+		"type_id": 8,
+		"type_name": "servicenow_tickets",
+		"parent_types": [
+		"incident"
+		],
+		"display_name": "ServiceNow Tickets",
+		"for_notifications": false,
+		"for_actions": true,
+		"for_custom_fields": true
+	};
+	
+	var endpoint = "/orgs/" + client.orgID + "/types";
+	client.request("post", endpoint, dataToPost);
+}]]></processing_script>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-12-20 22:24:42</sys_created_on>
+        <sys_id>f1322e970f030300bc87ba8ce1050e0c</sys_id>
+        <sys_mod_count>35</sys_mod_count>
+        <sys_name>resilient_utilities</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>sys_ui_page_f1322e970f030300bc87ba8ce1050e0c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-12-21 13:55:34</sys_updated_on>
+    </sys_ui_page>
+</record_update>

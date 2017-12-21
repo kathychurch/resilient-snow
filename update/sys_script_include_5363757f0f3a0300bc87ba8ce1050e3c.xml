@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_166541_ibm_resil.ResilientDefaultCreator</api_name>
+        <client_callable>false</client_callable>
+        <description>Default mapping functions for creating Resilient Incidents</description>
+        <name>ResilientDefaultCreator</name>
+        <script><![CDATA[var ResilientDefaultCreator = Class.create();
+ResilientDefaultCreator.prototype = {
+	initialize: function() {
+			this.resilientClient = new ResilientAPI();
+	},
+	
+	type: 'ResilientDefaultCreator',
+	
+	createIncident: function(current){
+		// Create discovered_date from opened_at
+		// date is like this 2017-10-11 05:37:16
+		var unixTime = current.opened_at;
+		unixTime = new GlideDateTime(unixTime);
+		unixTime = unixTime.getNumericValue();
+		
+		// Create new Resilient Incident
+		var newInc = {
+			"name": current.getValue('short_description'),
+			"discovered_date": unixTime
+		};
+		inc = this.resilientClient.createIncident(newInc);
+		
+		// Add entry for ServiceNow Ticket to Resilient Data Table
+		var tableRow = {
+			"snow_resilient_task_id": null,
+			"snow_ticket_number": current.getValue("number"),
+			"snow_short_description": current.getValue("short_description"),
+			"snow_status": current.getDisplayValue("state"),
+			"snow_ticket_sys_id": current.getValue("sys_id"),
+			"snow_table_name": current.getTableName()
+		};
+		var newRow = this.resilientClient.addDataTableRow(inc.id, "servicenow_tickets", tableRow);
+		
+		// Add a worknote to the Service Now Ticket with link to new Incident
+		url = this.resilientClient.baseURL + "/#incidents/" + inc.id;
+		current.work_notes = "Created Resilient Incident " + inc.id + " from this ticket. " + url;
+		current.update();
+		
+		return inc;
+	},
+	
+	createTask: function(incID, current){
+		// Create discovered_date from opened_at
+		// date is like this 2017-10-11 05:37:16
+		var unixTime = current.due_date;
+		if (unixTime){
+			unixTime = new GlideDateTime(unixTime);
+			unixTime = unixTime.getNumericValue();
+		}
+		else{
+			unixTime = null;
+		}
+		// Create new Resilient Task
+		var newTask = {
+			"name": "[" + current.getValue("number") + "]: " + current.getValue("short_description"),
+			"instr_text": current.getValue("short_description"),
+			"due_date": unixTime
+		};
+		task = this.resilientClient.createTask(incID, newTask);
+		
+		// Add entry for ServiceNow Ticket to Resilient Data Table
+		var tableRow = {
+			"snow_resilient_task_id": task.id,
+			"snow_ticket_number": current.getValue("number"),
+			"snow_short_description": current.getValue("short_description"),
+			"snow_status": current.getDisplayValue("state"),
+			"snow_ticket_sys_id": current.getValue("sys_id"),
+			"snow_table_name": current.getTableName()
+		};
+		var newRow = this.resilientClient.addDataTableRow(incID, "servicenow_tickets", tableRow);
+		
+		// Add a worknote to the Service Now Ticket with link to new Incident
+		url = this.resilientClient.baseURL + "/#incidents/" + incID + "?tab=81fcccb8-abc7-45fd-b7e9-2e494e7be849&task_id=" + task.id;
+		current.work_notes = "Created Resilient Task " + task.id + " on Incident "+ incID + " from this ticket. " + url;
+		current.update();
+		
+		return task;
+	}
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-12-09 19:15:34</sys_created_on>
+        <sys_id>5363757f0f3a0300bc87ba8ce1050e3c</sys_id>
+        <sys_mod_count>18</sys_mod_count>
+        <sys_name>ResilientDefaultCreator</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>sys_script_include_5363757f0f3a0300bc87ba8ce1050e3c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-12-10 01:48:09</sys_updated_on>
+    </sys_script_include>
+</record_update>

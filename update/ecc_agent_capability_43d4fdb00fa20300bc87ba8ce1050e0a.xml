@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update sys_domain="global" table="ecc_agent_capability">
+    <ecc_agent_capability action="INSERT_OR_UPDATE">
+        <capability>ResilientAccess</capability>
+        <sys_class_name>ecc_agent_capability</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-11-18 01:17:20</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>43d4fdb00fa20300bc87ba8ce1050e0a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ResilientAccess</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>ecc_agent_capability_43d4fdb00fa20300bc87ba8ce1050e0a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-11-18 01:17:20</sys_updated_on>
+        <value/>
+    </ecc_agent_capability>
+</record_update>

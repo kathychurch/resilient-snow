@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_properties_category">
+    <sys_properties_category action="INSERT_OR_UPDATE">
+        <name>Resilient Properties</name>
+        <sys_class_name>sys_properties_category</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-11-09 19:08:31</sys_created_on>
+        <sys_id>68c3df820f920300bc87ba8ce1050ed5</sys_id>
+        <sys_mod_count>9</sys_mod_count>
+        <sys_name>Resilient Properties</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>sys_properties_category_68c3df820f920300bc87ba8ce1050ed5</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-12-21 02:04:15</sys_updated_on>
+        <title><![CDATA[<p><img style="align: baseline;" title="" src="resilient.pngx" alt="resilient logo" width="300" align="baseline" border="" hspace="" vspace="" /></p>
+<p> </p>
+<p>Please make your changes and then click <strong>Save</strong>.</p>
+<p> </p>]]></title>
+    </sys_properties_category>
+    <sys_translated_text action="delete_multiple" query="documentkey=68c3df820f920300bc87ba8ce1050ed5"/>
+</record_update>

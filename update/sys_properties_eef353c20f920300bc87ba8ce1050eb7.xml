@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_properties">
+    <sys_properties action="INSERT_OR_UPDATE">
+        <choices/>
+        <description>Hostname or IP Address for Resilient instance</description>
+        <ignore_cache>false</ignore_cache>
+        <is_private>false</is_private>
+        <name>x_166541_ibm_resil.ResilientHost</name>
+        <read_roles>x_166541_ibm_resil.admin</read_roles>
+        <suffix>ResilientHost</suffix>
+        <sys_class_name>sys_properties</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-11-09 19:10:06</sys_created_on>
+        <sys_id>eef353c20f920300bc87ba8ce1050eb7</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>x_166541_ibm_resil.ResilientHost</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>sys_properties_eef353c20f920300bc87ba8ce1050eb7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-11-20 22:11:23</sys_updated_on>
+        <type>string</type>
+        <value>resilientps-green.resilientsystems.com</value>
+        <write_roles>x_166541_ibm_resil.admin</write_roles>
+    </sys_properties>
+    <sys_translated_text action="delete_multiple" query="documentkey=eef353c20f920300bc87ba8ce1050eb7"/>
+</record_update>
