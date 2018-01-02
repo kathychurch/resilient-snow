@@ -36,8 +36,9 @@ function doConfig() {
 		gs.addInfoMessage("Connection Test Successful!");
 	}
 	else if(action==="config"){
-		//TODO: Create Resilient Data Table
 		createTable(resilientClient);
+		createMessageDestinations(resilientClient);
+		createRules(resilientClient);
 		gs.addInfoMessage("Resilient Configured Successfully!");
 	}
 }
@@ -48,6 +49,14 @@ catch (ex){
 	else if(action==="config"){
 		gs.addErrorMessage("Resilient Configuration Failed!");
 	}
+}
+
+function createMessageDestinations(client){
+	//TODO
+}
+
+function createRules(client){
+	//TODO
 }
 
 function createTable(client){
@@ -144,13 +153,13 @@ function createTable(client){
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-12-20 22:24:42</sys_created_on>
         <sys_id>f1322e970f030300bc87ba8ce1050e0c</sys_id>
-        <sys_mod_count>35</sys_mod_count>
+        <sys_mod_count>36</sys_mod_count>
         <sys_name>resilient_utilities</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy/>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_ui_page_f1322e970f030300bc87ba8ce1050e0c</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2017-12-21 13:55:34</sys_updated_on>
+        <sys_updated_on>2017-12-21 15:22:52</sys_updated_on>
     </sys_ui_page>
 </record_update>

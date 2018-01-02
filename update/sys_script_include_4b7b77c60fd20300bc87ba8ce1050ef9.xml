@@ -184,7 +184,8 @@ ResilientAPI.prototype = {
 	getIncident: function(incID){
 		var endpoint = "/orgs/" + this.orgID + "/incidents/" + incID;
 		var headers = {
-			"handle_format": "names"
+			"handle_format": "names",
+			"text_content_output_format": "always_text"
 		};
 		return this.request("get", endpoint, null, headers);
 	},
@@ -234,7 +235,8 @@ ResilientAPI.prototype = {
 	getTask: function(taskID){
 		var endpoint = "/orgs/" + this.orgID + "/tasks/" + taskID;
 		var headers = {
-			"handle_format": "names"
+			"handle_format": "names",
+			"text_content_output_format": "always_text"
 		};
 		return this.request("get", endpoint, null, headers);
 	},
@@ -360,7 +362,13 @@ ResilientAPI.prototype = {
 			for (var fieldname in matchCriteria){
 				// Get ID for field
 				fieldID = tableInfo.fields[fieldname].id;
-				query = "datatable." + fieldID + "." + fieldname + ": " + matchCriteria[fieldname];
+				if (matchCriteria[fieldname] === null){
+					// Need to look for null values a special way
+					query = "((-_exists_:datatable." + fieldID + "." + fieldname + ") OR datatable." + fieldID + "." + fieldname + ":null)";
+				}
+				else{
+					query = "datatable." + fieldID + "." + fieldname + ": " + matchCriteria[fieldname];
+				}
 				queryPieces.push(query);
 			}
 			var completeQuery = queryPieces.join(" AND ");
@@ -383,7 +391,12 @@ ResilientAPI.prototype = {
 				}
 			};
 			endpoint = "/search_ex";
-			response = this.request("post", endpoint, searchJSON);
+			gs.debug(this._parser.encode(searchJSON));
+			var headers = {
+				"handle_format": "names",
+				"text_content_output_format": "always_text"
+			};
+			response = this.request("post", endpoint, searchJSON, headers);
 			if (response.results){
 				// handle_format=names doesn't work on search_ex
 				// we must manually swap the ID values for names
@@ -397,7 +410,12 @@ ResilientAPI.prototype = {
 						row = response.results[resultIndex].result;
 						for (fieldID in row.cells){
 							fieldname = tableInfoInverse[fieldID].name;
-							row.cells[fieldname] = row.cells[fieldID];
+							if (typeof row.cells[fieldID] === undefined){
+								row.cells[fieldname] = null;
+							}
+							else{
+								row.cells[fieldname] = row.cells[fieldID];
+							}
 							delete row.cells[fieldID];
 						}
 						rows.push(row);
@@ -411,7 +429,11 @@ ResilientAPI.prototype = {
 			else{
 				// Just get all the rows
 				endpoint = "/orgs/" + this.orgID + "/incidents/" + incID + "/table_data/" +  tableName;
-				response = this.request("get", endpoint);
+				var headers = {
+					"handle_format": "names",
+					"text_content_output_format": "always_text"
+				};
+				response = this.request("get", endpoint, null, headers);
 				if (response.rows){
 					return response.rows;
 				}
@@ -433,13 +455,13 @@ ResilientAPI.prototype = {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-11-09 22:03:25</sys_created_on>
         <sys_id>4b7b77c60fd20300bc87ba8ce1050ef9</sys_id>
-        <sys_mod_count>88</sys_mod_count>
+        <sys_mod_count>95</sys_mod_count>
         <sys_name>ResilientAPI</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_script_include_4b7b77c60fd20300bc87ba8ce1050ef9</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2017-12-10 01:00:29</sys_updated_on>
+        <sys_updated_on>2018-01-02 22:20:20</sys_updated_on>
     </sys_script_include>
 </record_update>
