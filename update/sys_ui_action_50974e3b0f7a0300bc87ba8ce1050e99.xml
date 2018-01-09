@@ -5,7 +5,7 @@
         <active>true</active>
         <client>true</client>
         <comments>Create a task in IBM Resilient IRP</comments>
-        <condition/>
+        <condition>(current.isValidField("u_resilient_id") &amp;&amp; !current.u_resilient_id) || !current.isValidField("u_resilient_id")</condition>
         <form_action>true</form_action>
         <form_button>false</form_button>
         <form_context_menu>false</form_context_menu>
@@ -26,13 +26,13 @@
         <script><![CDATA[//Client-side 'onclick' function
 function getIncidentID(){
 	//Create and open the dialog form
-
-	var lastIncID = getPreference('resilient_incident_id'); 
-
+	
+	var lastIncID = getPreference('resilient_incident_id');
+	
 	var incID = prompt("Enter Resilient Incident ID to add task to:", lastIncID);
 	if (incID){
 		if (lastIncID != incID){
-			setPreference('resilient_incident_id', incID); 
+			setPreference('resilient_incident_id', incID);
 		}
 		//Call the UI Action and skip the 'onclick' function
 		gsftSubmit(null, g_form.getFormElement(), 'create_resilient_task');
@@ -45,6 +45,7 @@ if(typeof window == 'undefined')
 	createTask();
 
 function createTask() {
+	action.setRedirectURL(current);
 	var incID = gs.getUser().getPreference("resilient_incident_id");
 	var creator;
 	try{
@@ -57,18 +58,17 @@ function createTask() {
 				creator = new ResilientDefaultCreator();
 			}
 			catch (ex){
-				gs.addInfoMessage("Failed to Create Resilient Task");
+				gs.addInfoMessage("Failed to Create Resilient Task: " + ex.toString());
 				throw ex;
 			}
 		} else {
-			gs.addInfoMessage("Failed to Create Resilient Task");
+			gs.addInfoMessage("Failed to Create Resilient Task: " + ex.toString());
 			throw ex;
 		}
 	}
-	
-	var task = creator.createTask(incID, current);
-	gs.addInfoMessage("Task " + task.id + " created on Resilient Incident " + incID);
-	action.setRedirectURL(current);
+
+	creator.createTask(incID, current);
+
 }]]></script>
         <show_insert>false</show_insert>
         <show_multiple_update>false</show_multiple_update>
@@ -80,7 +80,7 @@ function createTask() {
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>50974e3b0f7a0300bc87ba8ce1050e99</sys_id>
-        <sys_mod_count>10</sys_mod_count>
+        <sys_mod_count>15</sys_mod_count>
         <sys_name>Create Resilient Task</sys_name>
         <sys_overrides/>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
@@ -88,7 +88,7 @@ function createTask() {
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_ui_action_50974e3b0f7a0300bc87ba8ce1050e99</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2017-12-09 22:11:02</sys_updated_on>
+        <sys_updated_on>2018-01-08 22:32:36</sys_updated_on>
         <table>incident</table>
         <ui11_compatible>true</ui11_compatible>
         <ui16_compatible>true</ui16_compatible>

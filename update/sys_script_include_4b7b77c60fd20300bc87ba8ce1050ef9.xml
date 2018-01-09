@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <record_update table="sys_script_include">
     <sys_script_include action="INSERT_OR_UPDATE">
-        <access>package_private</access>
+        <access>public</access>
         <active>true</active>
         <api_name>x_166541_ibm_resil.ResilientAPI</api_name>
         <client_callable>false</client_callable>
@@ -92,7 +92,7 @@ ResilientAPI.prototype = {
 		
 		if (errorMsg){
 			errorMsg = 'Failed to establish Resilient session (status ' + status + '): ' + errorMsg;
-			gs.addInfoMessage(errorMsg);
+			gs.error(errorMsg);
 			throw errorMsg;
 		}
 		
@@ -116,7 +116,7 @@ ResilientAPI.prototype = {
 		}
 		if (errorMsg){
 			errorMsg = 'Resilient Connection Failed: ' + errorMsg;
-			gs.addInfoMessage(errorMsg);
+			gs.error(errorMsg);
 			throw errorMsg;
 		}
 		
@@ -175,7 +175,7 @@ ResilientAPI.prototype = {
 		}
 		if (errorMsg){
 			errorMsg = 'Resilient ' + method + ' Request Failed (' + url + '): ' + status + ' ' + errorMsg;
-			gs.addInfoMessage(errorMsg);
+			gs.error(errorMsg);
 			throw errorMsg;
 		}
 		return responseBody;
@@ -246,7 +246,10 @@ ResilientAPI.prototype = {
 		var headers = {
 			"handle_format": "names"
 		};
-		return this.request("post", endpoint, taskData, headers);
+		var newTask =  this.request("post", endpoint, taskData, headers);
+		
+		// posting to /task just returns the ID. Get the actual task JSON.
+		return this.getTask(newTask.id);
 	},
 	
 	updateTask: function(task){
@@ -455,13 +458,13 @@ ResilientAPI.prototype = {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-11-09 22:03:25</sys_created_on>
         <sys_id>4b7b77c60fd20300bc87ba8ce1050ef9</sys_id>
-        <sys_mod_count>95</sys_mod_count>
+        <sys_mod_count>98</sys_mod_count>
         <sys_name>ResilientAPI</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_script_include_4b7b77c60fd20300bc87ba8ce1050ef9</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-02 22:20:20</sys_updated_on>
+        <sys_updated_on>2018-01-08 20:30:11</sys_updated_on>
     </sys_script_include>
 </record_update>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <record_update table="sys_script_include">
     <sys_script_include action="INSERT_OR_UPDATE">
-        <access>package_private</access>
+        <access>public</access>
         <active>true</active>
         <api_name>x_166541_ibm_resil.ResilientDefaultCreator</api_name>
         <client_callable>false</client_callable>
@@ -10,45 +10,104 @@
         <script><![CDATA[var ResilientDefaultCreator = Class.create();
 ResilientDefaultCreator.prototype = {
 	initialize: function() {
-			this.resilientClient = new ResilientAPI();
+		this.resilientClient = new ResilientAPI();
 	},
 	
 	type: 'ResilientDefaultCreator',
 	
 	createIncident: function(current){
+		// Create new Resilient Incident
+		var incJSON;
+		try {
+			incJSON = this.createIncidentJSON(current);
+		}
+		catch (ex){
+			gs.addErrorMessage("Resilient Incident JSON Creation Failed. Review createIncidentJSON function logic.: " + ex.toString());
+			throw ex;
+		}
+		try {
+			inc = this.resilientClient.createIncident(incJSON);
+			gs.addInfoMessage("Created Resilient Incident " + inc.id.toString());
+		}
+		catch (ex){
+			gs.addErrorMessage("Resilient Incident Creation Failed: " + ex.toString());
+			throw ex;
+		}
+		
+		// Add entry for ServiceNow Ticket to Resilient Data Table
+		try {
+			this.addDataTableEntry(current, inc.id, null);
+		}
+		catch (ex){
+			gs.addErrorMessage("Failed to populate servicenow table in Resilient: " + ex.toString());
+			gs.error(ex);
+		}
+		
+		// Store Resilient ID to ticket and add note
+		try {
+			this.updateTicket(current, inc, null);
+		}
+		catch (ex) {
+			gs.addErrorMessage("Failed to update servicenow ticket: " + ex.toString());
+			gs.error(ex);
+		}
+		
+		return inc;
+	},
+	
+	createTask: function(incID, current){
+		var taskJSON;
+		try {
+			taskJSON = this.createTaskJSON(current);
+		}
+		catch (ex) {
+			gs.addErrorMessage("Resilient Task JSON Creation Failed. Review createTaskJSON function logic.: " + ex.toString());
+			throw ex;
+		}
+		try{
+			task = this.resilientClient.createTask(incID, taskJSON);
+			gs.addInfoMessage("Created Resilient Task " + task.id.toString() + " On Incident " + task.inc_id.toString());
+		}
+		catch (ex){
+			gs.addErrorMessage("Resilient Task Creation Failed: " + ex.toString());
+			throw ex;
+		}
+		
+		// Add entry for ServiceNow Ticket to Resilient Data Table
+		try {
+			this.addDataTableEntry(current, task.inc_id, task.id);
+		}
+		catch (ex){
+			gs.addErrorMessage("Failed to populate servicenow table in Resilient: " + ex.toString());
+			gs.error(ex);
+		}
+		
+		// Store Resilient ID to ticket and add note
+		try {
+			this.updateTicket(current, null, task);
+		}
+		catch (ex) {
+			gs.addErrorMessage("Failed to update servicenow ticket: " + ex.toString());
+			gs.error(ex);
+		}
+		return task;
+	},
+	
+	createIncidentJSON: function(current){
 		// Create discovered_date from opened_at
 		// date is like this 2017-10-11 05:37:16
 		var unixTime = current.opened_at;
 		unixTime = new GlideDateTime(unixTime);
 		unixTime = unixTime.getNumericValue();
 		
-		// Create new Resilient Incident
-		var newInc = {
+		var inc = {
 			"name": current.getValue('short_description'),
 			"discovered_date": unixTime
 		};
-		inc = this.resilientClient.createIncident(newInc);
-		
-		// Add entry for ServiceNow Ticket to Resilient Data Table
-		var tableRow = {
-			"snow_resilient_task_id": null,
-			"snow_ticket_number": current.getValue("number"),
-			"snow_short_description": current.getValue("short_description"),
-			"snow_status": current.getDisplayValue("state"),
-			"snow_ticket_sys_id": current.getValue("sys_id"),
-			"snow_table_name": current.getTableName()
-		};
-		var newRow = this.resilientClient.addDataTableRow(inc.id, "servicenow_tickets", tableRow);
-		
-		// Add a worknote to the Service Now Ticket with link to new Incident
-		url = this.resilientClient.baseURL + "/#incidents/" + inc.id;
-		current.work_notes = "Created Resilient Incident " + inc.id + " from this ticket. " + url;
-		current.update();
-		
 		return inc;
 	},
 	
-	createTask: function(incID, current){
+	createTaskJSON: function(current){
 		// Create discovered_date from opened_at
 		// date is like this 2017-10-11 05:37:16
 		var unixTime = current.due_date;
@@ -60,16 +119,42 @@ ResilientDefaultCreator.prototype = {
 			unixTime = null;
 		}
 		// Create new Resilient Task
-		var newTask = {
+		var task = {
 			"name": "[" + current.getValue("number") + "]: " + current.getValue("short_description"),
 			"instr_text": current.getValue("short_description"),
 			"due_date": unixTime
 		};
-		task = this.resilientClient.createTask(incID, newTask);
+		return task;
+	},
+	
+	updateTicket: function(current, incident, task){
+		// Update ServiceNow ticket with Details of task or incident created
 		
-		// Add entry for ServiceNow Ticket to Resilient Data Table
+		// Add a worknote to the Service Now Ticket with link to new Incident/Task
+		var incID = task ? task.inc_id : incident.id.toString();
+		var id = incID;
+		url = this.resilientClient.baseURL + "/#incidents/" + incID;
+		if (task){
+			id = incID + "." + task.id;
+			url = url + "?tab=81fcccb8-abc7-45fd-b7e9-2e494e7be849&task_id=" + task.id;
+			current.work_notes = "Created Resilient Task " + task.id + " on Incident "+ incID + " from this ticket. " + url;
+		}
+		else{
+			current.work_notes = "Created Resilient Incident " + incID + " from this ticket. " + url;
+		}
+		
+		// Store Resilient Incident (and Task) ID to field in ticket
+		if (current.isValidField('u_resilient_id')){
+			current.u_resilient_id = id;
+		}
+
+		current.update("Add Resilient Incident Details");
+	},
+	
+	addDataTableEntry: function(current, incID, taskID){
+		// Add Entry for Ticket in Resilient Datatable
 		var tableRow = {
-			"snow_resilient_task_id": task.id,
+			"snow_resilient_task_id": taskID ? taskID : null,
 			"snow_ticket_number": current.getValue("number"),
 			"snow_short_description": current.getValue("short_description"),
 			"snow_status": current.getDisplayValue("state"),
@@ -77,13 +162,6 @@ ResilientDefaultCreator.prototype = {
 			"snow_table_name": current.getTableName()
 		};
 		var newRow = this.resilientClient.addDataTableRow(incID, "servicenow_tickets", tableRow);
-		
-		// Add a worknote to the Service Now Ticket with link to new Incident
-		url = this.resilientClient.baseURL + "/#incidents/" + incID + "?tab=81fcccb8-abc7-45fd-b7e9-2e494e7be849&task_id=" + task.id;
-		current.work_notes = "Created Resilient Task " + task.id + " on Incident "+ incID + " from this ticket. " + url;
-		current.update();
-		
-		return task;
 	}
 };
 ]]></script>
@@ -91,13 +169,13 @@ ResilientDefaultCreator.prototype = {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-12-09 19:15:34</sys_created_on>
         <sys_id>5363757f0f3a0300bc87ba8ce1050e3c</sys_id>
-        <sys_mod_count>18</sys_mod_count>
+        <sys_mod_count>29</sys_mod_count>
         <sys_name>ResilientDefaultCreator</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_script_include_5363757f0f3a0300bc87ba8ce1050e3c</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2017-12-10 01:48:09</sys_updated_on>
+        <sys_updated_on>2018-01-08 21:42:38</sys_updated_on>
     </sys_script_include>
 </record_update>
