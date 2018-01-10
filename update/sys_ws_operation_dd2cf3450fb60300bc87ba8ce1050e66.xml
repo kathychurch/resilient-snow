@@ -9,10 +9,46 @@
         <http_method>POST</http_method>
         <name>Create WorkNote</name>
         <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
-	var requestData = request.body.data;
-	gs.eventQueue("x_166541_ibm_resil.resilient_note", null, requestData, "worknote");
-		
-	})(request, response);]]></operation_script>
+	var message = request.body.data;
+	var handler;
+	try {
+		handler = new ResilientHandler();
+	}
+	catch (ex) {
+		if (ex instanceof ReferenceError) {
+			// no custom handler defined, use default
+			try{
+				handler = new ResilientDefaultHandler();
+			}
+			catch (ex) {
+				errorMsg = "Couldn't instantiate ResilientDefaultHandler" + ": " + ex.toString();
+			}
+		} else {
+			errorMsg = "Couldn't instantiate custom ResilientHandler" + ": " + ex.toString();
+		}
+	}
+			
+	try{
+		result = handler.worknote(message);
+		if (typeof result === "string"){
+			// an error message
+			response.setStatus(400);
+			result = {
+				"message": "Failed to update ticket. " + result
+			};
+		}
+		else{
+			response.setStatus(201);
+		}
+	}
+	catch (ex){
+		response.setStatus(500);
+		result = {
+			"message": "Failed to update ticket. " + ex.toString()
+		};
+	}
+	response.setBody(result);
+})(request, response);]]></operation_script>
         <operation_uri>/api/x_166541_ibm_resil/v1/resilient_notification/createworknote</operation_uri>
         <produces>application/json</produces>
         <produces_customized>false</produces_customized>
@@ -37,14 +73,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-12-01 16:05:59</sys_created_on>
         <sys_id>dd2cf3450fb60300bc87ba8ce1050e66</sys_id>
-        <sys_mod_count>4</sys_mod_count>
+        <sys_mod_count>5</sys_mod_count>
         <sys_name>Create WorkNote</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy/>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_ws_operation_dd2cf3450fb60300bc87ba8ce1050e66</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2017-12-01 21:10:47</sys_updated_on>
+        <sys_updated_on>2018-01-09 22:15:10</sys_updated_on>
         <web_service_definition display_value="Resilient Notification">19e733c10fb60300bc87ba8ce1050e33</web_service_definition>
         <web_service_version display_value="v1">ce483f850ff20300bc87ba8ce1050e3a</web_service_version>
     </sys_ws_operation>

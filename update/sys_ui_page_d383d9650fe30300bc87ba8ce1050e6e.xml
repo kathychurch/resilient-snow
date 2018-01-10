@@ -10,28 +10,32 @@
 <j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
 <j2:set var="jvar_amp" value="&amp;"/>
  <script>
-	console.log("kathy was here");
-	var resLink = decodeURIComponent("${sysparm_res_uri}").replace("&amp;", "$[jvar_amp]");
-	var currentLink =  decodeURIComponent("${sysparm_current_uri}").replace("&amp;", "$[jvar_amp]");
-	console.log(resLink);
-	console.log(currentLink);
-    window.open(resLink);
-    window.open(currentLink, "_parent");
+	 var resLink = "${sysparm_res_uri}".replace(/&amp;/g, "$[jvar_amp]");
+	 var currentLink =  "${sysparm_current_uri}".replace(/&amp;/g, "$[jvar_amp]");
+	 console.log(resLink);
+	 console.log(currentLink);
+	 //window.location.href=currentLink;
+	 //window.history.back();
+	 //history.replaceState( {} , 'f', currentLink );
+	 window.location.replace(currentLink);
+	 //window.location = currentLink;
+	 var newWin = window.open(resLink);
+	 //var oldWin = window.open(currentLink, "_parent", replace=false);
  </script>
 </j:jelly>]]></html>
         <name>resilient_redirect</name>
-        <processing_script/>
+        <processing_script><![CDATA[action.setRedirectURL(redirectURL);]]></processing_script>
         <sys_class_name>sys_ui_page</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-01-08 23:54:48</sys_created_on>
         <sys_id>d383d9650fe30300bc87ba8ce1050e6e</sys_id>
-        <sys_mod_count>23</sys_mod_count>
+        <sys_mod_count>58</sys_mod_count>
         <sys_name>resilient_redirect</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy/>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_ui_page_d383d9650fe30300bc87ba8ce1050e6e</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-09 03:49:35</sys_updated_on>
+        <sys_updated_on>2018-01-09 17:37:24</sys_updated_on>
     </sys_ui_page>
 </record_update>

@@ -101,7 +101,7 @@ ResilientDefaultCreator.prototype = {
 		unixTime = unixTime.getNumericValue();
 		
 		var inc = {
-			"name": current.getValue('short_description'),
+			"name": "[" + current.getValue(number) + "] " + current.getValue('short_description'),
 			"discovered_date": unixTime
 		};
 		return inc;
@@ -120,7 +120,7 @@ ResilientDefaultCreator.prototype = {
 		}
 		// Create new Resilient Task
 		var task = {
-			"name": "[" + current.getValue("number") + "]: " + current.getValue("short_description"),
+			"name": "[" + current.getValue("number") + "] " + current.getValue("short_description"),
 			"instr_text": current.getValue("short_description"),
 			"due_date": unixTime
 		};
@@ -169,13 +169,13 @@ ResilientDefaultCreator.prototype = {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-12-09 19:15:34</sys_created_on>
         <sys_id>5363757f0f3a0300bc87ba8ce1050e3c</sys_id>
-        <sys_mod_count>29</sys_mod_count>
+        <sys_mod_count>30</sys_mod_count>
         <sys_name>ResilientDefaultCreator</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_script_include_5363757f0f3a0300bc87ba8ce1050e3c</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-08 21:42:38</sys_updated_on>
+        <sys_updated_on>2018-01-09 22:41:48</sys_updated_on>
     </sys_script_include>
 </record_update>

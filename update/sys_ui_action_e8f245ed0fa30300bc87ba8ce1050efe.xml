@@ -23,17 +23,16 @@
         <name>View Resilient Incident</name>
         <onclick/>
         <order>100</order>
-        <script><![CDATA[action.setReturnURL(current);
-try{
-	var keys = Object.keys(action);
-	var currentURL = "nav_to.do?uri=" + action.getReturnURL();
-}
-catch (ex){
-	var excep = ex.toString();
-}
+        <script><![CDATA[var origReturnURL = action.getReturnURL();
+action.setReturnURL(current);
+
+//var currentURL = "nav_to.do?uri=" + encodeURIComponent(action.getReturnURL());
+var currentURL = action.getReturnURL();
+action.setReturnURL(origReturnURL);
+
 var incidentURL = "https://" + gs.getProperty("x_166541_ibm_resil.ResilientHost") + "/#incidents/" + current.u_resilient_id;
 var redirectURL = "x_166541_ibm_resil_resilient_redirect.do?sysparm_current_uri=" + encodeURIComponent(currentURL) + "&sysparm_res_uri=" + encodeURIComponent(incidentURL);
-gs.addInfoMessage(redirectURL);
+gs.debug(redirectURL);
 action.setRedirectURL(redirectURL);]]></script>
         <show_insert>false</show_insert>
         <show_multiple_update>false</show_multiple_update>
@@ -45,7 +44,7 @@ action.setRedirectURL(redirectURL);]]></script>
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>e8f245ed0fa30300bc87ba8ce1050efe</sys_id>
-        <sys_mod_count>23</sys_mod_count>
+        <sys_mod_count>33</sys_mod_count>
         <sys_name>View Resilient Incident</sys_name>
         <sys_overrides/>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
@@ -53,7 +52,7 @@ action.setRedirectURL(redirectURL);]]></script>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_ui_action_e8f245ed0fa30300bc87ba8ce1050efe</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-09 03:07:20</sys_updated_on>
+        <sys_updated_on>2018-01-09 22:50:54</sys_updated_on>
         <table>incident</table>
         <ui11_compatible>true</ui11_compatible>
         <ui16_compatible>true</ui16_compatible>
