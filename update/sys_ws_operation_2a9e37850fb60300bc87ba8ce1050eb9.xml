@@ -8,37 +8,45 @@
         <enforce_acl/>
         <http_method>PATCH</http_method>
         <name>Update Ticket</name>
-        <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+        <operation_script><![CDATA[function stringToFunction(str) {
+	var arr = str.split(".");
+	
+	var fn = this;
+	for (var i = 0, len = arr.length; i < len; i++) {
+		fn = fn[arr[i]];
+	}
+	
+	if (typeof fn !== "function") {
+		throw new Error("function not found");
+	}
+	
+	return  fn;
+}
+
+(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
 	var message = request.body.data;
-	var handler;
-	try {
-		handler = new ResilientHandler();
-	}
-	catch (ex) {
-		if (ex instanceof ReferenceError) {
-			// no custom handler defined, use default
-			try{
-				handler = new ResilientDefaultHandler();
-			}
-			catch (ex) {
-				errorMsg = "Couldn't instantiate ResilientDefaultHandler" + ": " + ex.toString();
-			}
-		} else {
-			errorMsg = "Couldn't instantiate custom ResilientHandler" + ": " + ex.toString();
-		}
-	}
-			
 	try{
-		result = handler.update(message);
-		if (typeof result === "string"){
-			// an error message
+		var className = gs.getProperty("x_166541_ibm_resil.ResilientHandlerClass");
+		if (!className){
 			response.setStatus(400);
 			result = {
-				"message": "Failed to update ticket. " + result
+				"message": "ResilientHandlerClass property not set"
 			};
 		}
 		else{
-			response.setStatus(201);
+			var HandlerClass = stringToFunction(className);
+			var handler = new HandlerClass();
+			result = handler.update(message);
+			if (typeof result === "string"){
+				// an error message
+				response.setStatus(400);
+				result = {
+					"message": "Failed to update ticket. " + result
+				};
+			}
+			else{
+				response.setStatus(201);
+			}
 		}
 	}
 	catch (ex){
@@ -73,14 +81,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-12-01 16:14:33</sys_created_on>
         <sys_id>2a9e37850fb60300bc87ba8ce1050eb9</sys_id>
-        <sys_mod_count>5</sys_mod_count>
+        <sys_mod_count>6</sys_mod_count>
         <sys_name>Update Ticket</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy/>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_ws_operation_2a9e37850fb60300bc87ba8ce1050eb9</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2017-12-10 01:12:55</sys_updated_on>
+        <sys_updated_on>2018-01-12 01:46:55</sys_updated_on>
         <web_service_definition display_value="Resilient Notification">19e733c10fb60300bc87ba8ce1050e33</web_service_definition>
         <web_service_version display_value="v1">ce483f850ff20300bc87ba8ce1050e3a</web_service_version>
     </sys_ws_operation>

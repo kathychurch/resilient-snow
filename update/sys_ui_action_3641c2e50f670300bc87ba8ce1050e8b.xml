@@ -26,7 +26,8 @@
         <script><![CDATA[action.setReturnURL(current);
 try{
 	var keys = Object.keys(action);
-	var currentURL = "nav_to.do?uri=" + action.getReturnURL();
+	//var currentURL = "nav_to.do?uri=" + action.getReturnURL();
+	var currentURL = action.getReturnURL();
 }
 catch (ex){
 	var excep = ex.toString();
@@ -36,7 +37,7 @@ var incID = current.u_resilient_id.substr(0, dotIndex);
 var taskID = current.u_resilient_id.substr(dotIndex + 1);
 var incidentURL = "https://" + gs.getProperty("x_166541_ibm_resil.ResilientHost") + "/#incidents/" + incID + "?tab=81fcccb8-abc7-45fd-b7e9-2e494e7be849&task_id=" + taskID;
 var redirectURL = "x_166541_ibm_resil_resilient_redirect.do?sysparm_current_uri=" + encodeURIComponent(currentURL) + "&sysparm_res_uri=" + encodeURIComponent(incidentURL);
-gs.addInfoMessage(redirectURL);
+gs.debug(redirectURL);
 action.setRedirectURL(redirectURL);]]></script>
         <show_insert>false</show_insert>
         <show_multiple_update>false</show_multiple_update>
@@ -48,7 +49,7 @@ action.setRedirectURL(redirectURL);]]></script>
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>3641c2e50f670300bc87ba8ce1050e8b</sys_id>
-        <sys_mod_count>0</sys_mod_count>
+        <sys_mod_count>2</sys_mod_count>
         <sys_name>View Resilient Task</sys_name>
         <sys_overrides/>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
@@ -56,7 +57,7 @@ action.setRedirectURL(redirectURL);]]></script>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_ui_action_3641c2e50f670300bc87ba8ce1050e8b</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-09 03:15:48</sys_updated_on>
+        <sys_updated_on>2018-01-10 17:56:26</sys_updated_on>
         <table>incident</table>
         <ui11_compatible>true</ui11_compatible>
         <ui16_compatible>false</ui16_compatible>

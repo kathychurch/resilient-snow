@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="ResilientRecord" max_length="40" name="x_166541_ibm_resil_resilientrecord" type="collection">
+        <element label="Incident ID" max_length="40" name="incident_id" type="integer"/>
+        <element label="Task ID" max_length="40" name="task_id" type="integer"/>
+        <element label="Ticket SysID" max_length="40" name="ticket_sysid" type="string"/>
+        <element display="true" label="Ticket Table Name" max_length="40" name="ticket_table_name" type="string"/>
+    </element>
+</database>

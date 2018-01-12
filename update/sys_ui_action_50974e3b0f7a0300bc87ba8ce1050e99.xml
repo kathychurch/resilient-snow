@@ -44,31 +44,37 @@ function getIncidentID(){
 if(typeof window == 'undefined')
 	createTask();
 
+function stringToFunction(str) {
+	var arr = str.split(".");
+	
+	var fn = this;
+	for (var i = 0, len = arr.length; i < len; i++) {
+		fn = fn[arr[i]];
+	}
+	
+	if (typeof fn !== "function") {
+		throw new Error("function not found");
+	}
+	
+	return  fn;
+}
+
 function createTask() {
 	action.setRedirectURL(current);
 	var incID = gs.getUser().getPreference("resilient_incident_id");
-	var creator;
 	try{
-		creator = new ResilientCreator();
-	}
-	catch (ex) {
-		if (ex instanceof ReferenceError) {
-			// no custom mapping defined, use default
-			try{
-				creator = new ResilientDefaultCreator();
-			}
-			catch (ex){
-				gs.addInfoMessage("Failed to Create Resilient Task: " + ex.toString());
-				throw ex;
-			}
-		} else {
-			gs.addInfoMessage("Failed to Create Resilient Task: " + ex.toString());
-			throw ex;
+		var className = gs.getProperty("x_166541_ibm_resil.ResilientCreatorClass");
+		if (!className){
+			throw "ResilientCreatorClass property not set";
 		}
+		var CreatorClass = stringToFunction(className);
+		var creator = new CreatorClass();
+		task = creator.createTask(incID, current);
 	}
-
-	creator.createTask(incID, current);
-
+	catch (ex){
+		gs.addInfoMessage("Failed to Create Resilient Incident: " + ex.toString());
+		throw ex;
+	}
 }]]></script>
         <show_insert>false</show_insert>
         <show_multiple_update>false</show_multiple_update>
@@ -80,7 +86,7 @@ function createTask() {
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>50974e3b0f7a0300bc87ba8ce1050e99</sys_id>
-        <sys_mod_count>15</sys_mod_count>
+        <sys_mod_count>16</sys_mod_count>
         <sys_name>Create Resilient Task</sys_name>
         <sys_overrides/>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
@@ -88,7 +94,7 @@ function createTask() {
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_ui_action_50974e3b0f7a0300bc87ba8ce1050e99</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-08 22:32:36</sys_updated_on>
+        <sys_updated_on>2018-01-10 17:32:12</sys_updated_on>
         <table>incident</table>
         <ui11_compatible>true</ui11_compatible>
         <ui16_compatible>true</ui16_compatible>
