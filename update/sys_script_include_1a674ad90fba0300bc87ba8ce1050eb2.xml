@@ -15,44 +15,25 @@ ResilientDefaultHandler.prototype = {
 	type: 'ResilientDefaultHandler',
 	
 	create: function(message) {
-		var resilientClient = new ResilientAPI();
-		var gr = new GlideRecord('incident');
+		this.resilientClient = new ResilientAPI();
+		var gr;
 		var incID = message.incident.id;
 		var taskID;
-		// Re-Request so we get non-html versions of fields
-		message.incident = resilientClient.getIncident(incID);
 		if (message.task){
 			// Create Ticket from Task
 			taskID = message.task.id;
-			message.task = resilientClient.getTask(taskID);
-			gr.setValue("short_description", message.task.name);
-			gr.setValue("description", message.task.instr_text);
-			if (gr.isValidField("u_resilient_id")){
-				var id = message.task.inc_id + "." + message.task.id;
-				gr.setValue("u_resilient_id", id);
-			}
-			// TODO: Set Due Date
+			// re-request for non-html versions of fields
+			message.task = this.resilientClient.getTask(taskID);
+			gr = this.createFromTask(message.task, message.properties);
 		}
 		else if (message.incident){
 			// Create Ticket from Incident
-			incID = message.incident.id;
-			gr.setValue("short_description", message.incident.name);
-			gr.setValue("description", message.incident.description);
-			if (gr.isValidField("u_resilient_id")){
-				gr.setValue("u_resilient_id", message.incident.id.toString());
-			}
+			// Re-Request so we get non-html versions of fields
+			message.incident = this.resilientClient.getIncident(incID);
+			gr = this.createFromIncident(message.incident, message.properties);
 		}
 		else{
 			throw "Invalid Request from Resilient";
-		}
-		
-		if (message.properties){
-			if (message.properties.worknotes){
-				gr.work_notes = message.properties.worknotes;
-			}
-			if (message.properties.comments){
-				gr.comments = message.properties.comments;
-			}
 		}
 		
 		var sys_id = gr.insert();
@@ -62,28 +43,9 @@ ResilientDefaultHandler.prototype = {
 			throw errorMessage;
 		}
 		
-		if (message.task){
-			//Prefix task name with ticket number
-			message.task.name = "[" + gr.getValue("number") + "] " + message.task.name;
-			resilientClient.updateTask(message.task);
-		}
-		else {		
-			//Prefix incident name with ticket number
-			var updates = {"name": "[" + gr.getValue("number") + "] " + message.incident.name};
-			resilientClient.updateIncident(message.incident, updates);
-		}
+		this.updateResilientAfterCreate(sys_id, gr, message);
 		
-		var tableRow = {
-			"snow_resilient_task_id": taskID,
-			"snow_ticket_number": gr.getValue("number"),
-			"snow_short_description": gr.getValue("short_description"),
-			"snow_status": gr.getDisplayValue("state"),
-			"snow_ticket_sys_id": sys_id,
-			"snow_table_name": gr.getTableName(),
-		};
-		var newRow = resilientClient.addDataTableRow(incID, "servicenow_tickets", tableRow);
-		
-		
+		/*
 		var grJSON = {
 		};
 		for (var prop in gr) {
@@ -94,11 +56,111 @@ ResilientDefaultHandler.prototype = {
 		
 		// Return Full Ticket:
 		return grJSON;
+ 		*/
+		return{
+			"success": true
+		};
+	},
+	
+	createFromTask: function(task, properties){
+		var gr = new GlideRecord('incident');
+		var taskID = task.id;
+		gr.setValue("short_description", task.name);
+		gr.setValue("description", task.instr_text);
+		if (gr.isValidField("u_resilient_id")){
+			var id = task.inc_id + "." + task.id;
+			gr.setValue("u_resilient_id", id);
+		}
+		// TODO: Set Due Date
 		
+		if (properties){
+			if (properties.worknotes){
+				gr.work_notes = properties.worknotes;
+			}
+			if (properties.comments){
+				gr.comments = properties.comments;
+			}
+		}
+		return gr;
+	},
+	
+	createFromIncident: function(incident){
+		incID = incident.id;
+		gr.setValue("short_description", incident.name);
+		gr.setValue("description", incident.description);
+		if (gr.isValidField("u_resilient_id")){
+			gr.setValue("u_resilient_id", incident.id.toString());
+		}
+		if (properties){
+			if (properties.worknotes){
+				gr.work_notes = properties.worknotes;
+			}
+			if (properties.comments){
+				gr.comments = properties.comments;
+			}
+		}
+		return gr;
+	},
+	
+	updateResilientAfterCreate: function(sysID, gr, message){
+		var taskID = null;
+		var incID = message.incident.id;
+		var updates;
+		if (message.task){
+			taskID = message.task.id;
+			//Prefix task name with ticket number
+			updates = {
+				"name": "[" + gr.getValue("number") + "] " + message.task.name
+			};
+			this.resilientClient.updateTask(taskID, updates);
+		}
+		else {
+			//Prefix incident name with ticket number
+			updates = {
+				"name": "[" + gr.getValue("number") + "] " + message.incident.name
+			};
+			this.resilientClient.updateIncident(message.incident, updates);
+		}
+		
+		var tableRow = {
+			"snow_resilient_task_id": taskID,
+			"snow_ticket_number": gr.getValue("number"),
+			"snow_short_description": gr.getValue("short_description"),
+			"snow_status": gr.getDisplayValue("state"),
+			"snow_ticket_sys_id": sysID,
+			"snow_table_name": gr.getTableName(),
+		};
+		var newRow = this.resilientClient.addDataTableRow(incID, "servicenow_tickets", tableRow);
+	},
+	
+	getTicketToUpdate: function(incID, taskID){
+		// Match a Resilient Incident/Task up to an existing ServiceNow Ticket
+		var conditions = {
+			"snow_resilient_task_id": taskID
+		};
+		var rows = this.resilientClient.getDataTableRows(incID, "servicenow_tickets", conditions);
+		if (rows.length == 0 && taskID){
+			// Try again without task ID
+			conditions = {
+				"snow_resilient_task_id": null
+			};
+			rows = this.resilientClient.getDataTableRows(incID, "servicenow_tickets", conditions);
+		}
+		if (rows.length == 0){
+			throw("Couldn't find ticket for Resilient Incident.Task " + incID + "." + taskID);
+		}
+		else if (rows.length > 1){
+			throw("Resilient Incident.Task linked to multiple tickets" + incID + "." + taskID);
+		}
+		var sysID = rows[0].cells.snow_ticket_sys_id.value;
+		var tableName = rows[0].cells.snow_table_name.value;
+		var gr = new GlideRecord(tableName);
+		gr.get(sysID);
+		return gr;
 	},
 	
 	update: function(message) {
-		var resilientClient = new ResilientAPI();
+		this.resilientClient = new ResilientAPI();
 		var incID = message.incident.id;
 		// Re-Request so we get non-html versions of fields
 		message.incident = resilientClient.getIncident(incID);
@@ -108,21 +170,7 @@ ResilientDefaultHandler.prototype = {
 			message.task = resilientClient.getTask(taskID);
 		}
 		// Check which ticket this update is for
-		// This will be more efficient if stored in a field on the ticket!
-		var conditions = {
-			"snow_resilient_task_id": taskID
-		};
-		var rows = resilientClient.getDataTableRows(incID, "servicenow_tickets", conditions);
-		if (rows.length == 0){
-			throw("Couldn't find ticket for Resilient Incident.Task " + incID + "." + taskID);
-		}
-		else if (rows.length > 1){
-			throw("Ticket linked to multiple Resilient Incident.Task " + incID + "." + taskID);
-		}
-		var sysID = rows[0].cells.snow_ticket_sys_id.value;
-		var tableName = rows[0].cells.snow_table_name.value;
-		var gr = new GlideRecord(tableName);
-		gr.get(sysID);
+		var gr = this.getTicketToUpdate(incID, taskID);
 		
 		// Do Updates
 		if(message.incident.plan_status == "C"){
@@ -146,115 +194,92 @@ ResilientDefaultHandler.prototype = {
 		};
 		resilientClient.updateDataTableRow(incID, "servicenow_tickets", rows[0], rowUpdate);
 		
-		var grJSON = {
+		return{
+			"success": true
 		};
-		for (var prop in gr) {
-			if (typeof gr[prop] !== 'undefined' && gr[prop] !== null) {
-				grJSON[prop] = gr.getValue(prop);
-			}
-		}
-		
-		// Return Full Ticket:
-		return grJSON;
 	},
 	
 	worknote: function(message) {
 		var resilientClient = new ResilientAPI();
 		var incID = message.note.inc_id;
 		var taskID = message.note.task_id ? message.note.task_id : null;
-
+		
 		// Check which ticket this update is for
-		// This will be more efficient if stored in a field on the ticket!
-		var conditions = {
-			"snow_resilient_task_id": taskID
-		};
-		var rows = resilientClient.getDataTableRows(incID, "servicenow_tickets", conditions);
-		if (rows.length == 0){
-			throw("Couldn't find ticket for Resilient Incident.Task " + incID + "." + taskID);
-		}
-		else if (rows.length > 1){
-			throw("Ticket linked to multiple Resilient Incident.Task " + incID + "." + taskID);
-		}
-		var sysID = rows[0].cells.snow_ticket_sys_id.value;
-		var tableName = rows[0].cells.snow_table_name.value;
+		var gr = this.getTicketToUpdate(incID, taskID);
 		
-		// Re-Request so we get non-html versions of fields
-		if (taskID){
-			message.note = resilientClient.getTaskNote(message.note.task_id, message.note.id);
-		}
-		else{
-			message.note = resilientClient.getIncidentNote(message.note.inc_id, message.note.id);
-		}
-		
-		var gr = new GlideRecord(tableName);
-		gr.get(sysID);
-		
-		// Post Worknote
-		gr.work_notes = message.note.text;
-		gr.update();
+		this.postWorkNote(gr, message.note);
 		
 		var errorMessage = gr.getLastErrorMessage();
 		if (errorMessage){
 			throw errorMessage;
 		}
-
-		return{"success": true};
+		
+		return{
+			"success": true
+		};
 	},
 	
 	comment: function(message) {
 		var resilientClient = new ResilientAPI();
 		var incID = message.note.inc_id;
 		var taskID = message.note.task_id ? message.note.task_id : null;
-
+		
 		// Check which ticket this update is for
-		// This will be more efficient if stored in a field on the ticket!
-		var conditions = {
-			"snow_resilient_task_id": taskID
-		};
-		var rows = resilientClient.getDataTableRows(incID, "servicenow_tickets", conditions);
-		if (rows.length == 0){
-			throw("Couldn't find ticket for Resilient Incident.Task " + incID + "." + taskID);
-		}
-		else if (rows.length > 1){
-			throw("Ticket linked to multiple Resilient Incident.Task " + incID + "." + taskID);
-		}
-		var sysID = rows[0].cells.snow_ticket_sys_id.value;
-		var tableName = rows[0].cells.snow_table_name.value;
+		var gr = this.getTicketToUpdate(incID, taskID);
 		
-		// Re-Request so we get non-html versions of fields
-		if (taskID){
-			message.note = resilientClient.getTaskNote(message.note.task_id, message.note.id);
-		}
-		else{
-			message.note = resilientClient.getIncidentNote(message.note.inc_id, message.note.id);
-		}
-		
-		var gr = new GlideRecord(tableName);
-		gr.get(sysID);
-		
-		// Post Comment
-		gr.comments = message.note.text;
-		gr.update();
+		this.postComment(gr, message.note);
 		
 		var errorMessage = gr.getLastErrorMessage();
 		if (errorMessage){
 			throw errorMessage;
 		}
-
-		return{"success": true};
+		
+		return {
+			"success": true
+		};
+	},
+	
+	postComment: function(gr, note){
+		var taskID = note.task_id ? note.task_id : null;
+		// Re-Request so we get non-html versions of fields
+		if (taskID){
+			note = resilientClient.getTaskNote(taskID, note.id);
+		}
+		else{
+			note = resilientClient.getIncidentNote(note.inc_id, note.id);
+		}
+		
+		// Post Comment
+		gr.comments = note.text;
+		gr.update();
+	},
+	
+	postWorkNote: function(gr, note){
+		var taskID = note.task_id ? note.task_id : null;
+		// Re-Request so we get non-html versions of fields
+		if (taskID){
+			note = resilientClient.getTaskNote(taskID, note.id);
+		}
+		else{
+			note = resilientClient.getIncidentNote(note.inc_id, note.id);
+		}
+		
+		// Post Work Note
+		gr.work_notes = note.text;
+		gr.update();
 	}
 };]]></script>
         <sys_class_name>sys_script_include</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-12-02 02:11:52</sys_created_on>
         <sys_id>1a674ad90fba0300bc87ba8ce1050eb2</sys_id>
-        <sys_mod_count>27</sys_mod_count>
+        <sys_mod_count>43</sys_mod_count>
         <sys_name>ResilientDefaultHandler</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_script_include_1a674ad90fba0300bc87ba8ce1050eb2</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-12 01:53:32</sys_updated_on>
+        <sys_updated_on>2018-01-24 14:42:55</sys_updated_on>
     </sys_script_include>
 </record_update>

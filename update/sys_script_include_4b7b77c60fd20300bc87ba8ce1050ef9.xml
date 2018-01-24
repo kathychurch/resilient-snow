@@ -130,7 +130,7 @@ ResilientAPI.prototype = {
 		var responseBody;
 		var url = this.baseURL +"/rest" + endpoint;
 		
-		try {
+		//try {
 			var rm = new sn_ws.RESTMessageV2();
 			if (this.midServer){
 				rm.setMIDServer(this.midServer);
@@ -169,10 +169,10 @@ ResilientAPI.prototype = {
 			if (errorMsg && responseBody){
 				errorMsg = errorMsg + ": " + responseBody.message;
 			}
-		}
-		catch (ex) {
-			errorMsg = ex;
-		}
+		//}
+		//catch (ex) {
+		//	errorMsg = ex;
+		//}
 		if (errorMsg){
 			errorMsg = 'Resilient ' + method + ' Request Failed (' + url + '): ' + status + ' ' + errorMsg;
 			gs.error(errorMsg);
@@ -252,9 +252,21 @@ ResilientAPI.prototype = {
 		return this.getTask(newTask.id);
 	},
 	
-	updateTask: function(task){
-		// existing task with updates made
-		var endpoint = "/orgs/" + this.orgID + "/tasks/" + task.id;
+	updateTask: function(taskID, updates){
+		// updates is an object mapping of task fields to update
+		// first get the HTML rest-api version of the task
+		var endpoint = "/orgs/" + this.orgID + "/tasks/" + taskID;
+		var task = this.request("get", endpoint, null, null);
+		
+		for (var field in updates){
+			if (!updates.hasOwnProperty(field)) {
+				continue;
+			}
+			else {
+				task[field] = updates[field];
+			}
+		}
+		
 		var headers = {
 			"handle_format": "names"
 		};
@@ -375,6 +387,7 @@ ResilientAPI.prototype = {
 		// matchCriteria optional, if missing all rows returned
 		//curlybrace col1:value, col2:value,... curlybrace
 		var endpoint;
+		var headers;
 		if (matchCriteria){
 			var queryPieces = [];
 			endpoint = "/orgs/" + this.orgID + "/types/" + tableName;
@@ -413,7 +426,7 @@ ResilientAPI.prototype = {
 			};
 			endpoint = "/search_ex";
 			gs.debug(this._parser.encode(searchJSON));
-			var headers = {
+			headers = {
 				"handle_format": "names",
 				"text_content_output_format": "always_text"
 			};
@@ -423,66 +436,68 @@ ResilientAPI.prototype = {
 				// we must manually swap the ID values for names
 				var rows = [];
 				var result, row;
-				var tableInfoInverse = {};
-					for (fieldname in tableInfo.fields){
-						tableInfoInverse[tableInfo.fields[fieldname].id] = tableInfo.fields[fieldname];
-					}
-					for (var resultIndex in response.results){
-						row = response.results[resultIndex].result;
-						for (fieldID in row.cells){
-							fieldname = tableInfoInverse[fieldID].name;
-							if (typeof row.cells[fieldID] === undefined){
-								row.cells[fieldname] = null;
-							}
-							else{
-								row.cells[fieldname] = row.cells[fieldID];
-							}
-							delete row.cells[fieldID];
+				var tableInfoInverse = {
+					
+				};
+				for (fieldname in tableInfo.fields){
+					tableInfoInverse[tableInfo.fields[fieldname].id] = tableInfo.fields[fieldname];
+				}
+				for (var resultIndex in response.results){
+					row = response.results[resultIndex].result;
+					for (fieldID in row.cells){
+						fieldname = tableInfoInverse[fieldID].name;
+						if (typeof row.cells[fieldID] === undefined){
+							row.cells[fieldname] = null;
 						}
-						rows.push(row);
+						else{
+							row.cells[fieldname] = row.cells[fieldID];
+						}
+						delete row.cells[fieldID];
 					}
-					return rows;
+					rows.push(row);
 				}
-				else{
-					return [];
-				}
+				return rows;
 			}
 			else{
-				// Just get all the rows
-				endpoint = "/orgs/" + this.orgID + "/incidents/" + incID + "/table_data/" +  tableName;
-				var headers = {
-					"handle_format": "names",
-					"text_content_output_format": "always_text"
-				};
-				response = this.request("get", endpoint, null, headers);
-				if (response.rows){
-					return response.rows;
-				}
-				else{
-					return [];
-				}
+				return [];
 			}
-		},
-		
-		postAttachment: function(incID, filename){
-			// TODO:
-		},
-		
-		getAttachment: function(incID, filename){
-			// TODO:
 		}
-	};]]></script>
+		else{
+			// Just get all the rows
+			endpoint = "/orgs/" + this.orgID + "/incidents/" + incID + "/table_data/" +  tableName;
+			headers = {
+				"handle_format": "names",
+				"text_content_output_format": "always_text"
+			};
+			response = this.request("get", endpoint, null, headers);
+			if (response.rows){
+				return response.rows;
+			}
+			else{
+				return [];
+			}
+		}
+	},
+	
+	postAttachment: function(incID, filename){
+		// TODO:
+	},
+	
+	getAttachment: function(incID, filename){
+		// TODO:
+	}
+};]]></script>
         <sys_class_name>sys_script_include</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-11-09 22:03:25</sys_created_on>
         <sys_id>4b7b77c60fd20300bc87ba8ce1050ef9</sys_id>
-        <sys_mod_count>100</sys_mod_count>
+        <sys_mod_count>105</sys_mod_count>
         <sys_name>ResilientAPI</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_script_include_4b7b77c60fd20300bc87ba8ce1050ef9</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-09 22:21:51</sys_updated_on>
+        <sys_updated_on>2018-01-24 14:47:01</sys_updated_on>
     </sys_script_include>
 </record_update>
