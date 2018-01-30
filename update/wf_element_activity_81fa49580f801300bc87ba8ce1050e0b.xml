@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="wf_element_activity">
+    <wf_element_activity action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <attributes/>
+        <base_provider display_value="Run Script">d0c7fe11eb013100fc5e8a7af106fee0</base_provider>
+        <category>Resilient Orchestration</category>
+        <checked_out_by/>
+        <default_height/>
+        <default_width/>
+        <description>Create an Incident in Resilient from a Ticket in Service Now</description>
+        <image>images/links_view.gif</image>
+        <input_meta>{"name":"Input","type":"DATA_OBJECT","properties":[{"name":"incidentJSON","type":"STRING","mandatory":true}]}</input_meta>
+        <input_process_script/>
+        <input_transform/>
+        <local_variables/>
+        <name>Create Resilient Incident</name>
+        <output_meta>{"name":"Output","type":"DATA_OBJECT","properties":[{"name":"resilientIncidentID","type":"STRING"}]}</output_meta>
+        <output_process_script/>
+        <output_transform/>
+        <processing_script><![CDATA[activityOutput.resilientIncidentID = null;
+resilientClient = new ResilientAPI();
+try {
+	inc = this.resilientClient.createIncident(activityInput.incidentJSON);
+	gs.addInfoMessage("Created Resilient Incident " + inc.id.toString());
+	activityOutput.resilientIncidentID = inc.id;
+	workflow.scratchpad.resilientIncidentID = inc.id;
+}
+catch (ex){
+	gs.addErrorMessage("Resilient Incident Creation Failed: " + ex.toString());
+	gs.error(ex);
+	activityOutput.resilientIncidentID = null;
+}]]></processing_script>
+        <sample_payloads>{}</sample_payloads>
+        <short_description>Create Incident In Resilient</short_description>
+        <style/>
+        <sys_class_name>wf_element_activity</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-01-29 22:36:56</sys_created_on>
+        <sys_id>81fa49580f801300bc87ba8ce1050e0b</sys_id>
+        <sys_mod_count>6</sys_mod_count>
+        <sys_name>Create Resilient Incident</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>wf_element_activity_81fa49580f801300bc87ba8ce1050e0b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-01-30 19:44:41</sys_updated_on>
+        <version_container_id>205c099c0f401300bc87ba8ce1050e96</version_container_id>
+    </wf_element_activity>
+    <sys_translated_text action="delete_multiple" query="documentkey=81fa49580f801300bc87ba8ce1050e0b"/>
+    <wf_versionable action="INSERT_OR_UPDATE">
+        <checked_out/>
+        <checked_out_by/>
+        <published>false</published>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-01-29 22:36:56</sys_created_on>
+        <sys_id>6c5c099c0f401300bc87ba8ce1050e96</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-01-30 19:44:41</sys_updated_on>
+        <valid_from>2018-01-29 22:55:47</valid_from>
+        <valid_to/>
+        <version>1</version>
+        <version_container_id>205c099c0f401300bc87ba8ce1050e96</version_container_id>
+        <wf_element_definition display_value="Create Resilient Incident">81fa49580f801300bc87ba8ce1050e0b</wf_element_definition>
+    </wf_versionable>
+    <wf_condition_default action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Create Resilient Incident">81fa49580f801300bc87ba8ce1050e0b</activity_definition>
+        <condition/>
+        <derived_definition/>
+        <else_flag>true</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <name>Failure</name>
+        <order>200</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-01-29 22:55:30</sys_created_on>
+        <sys_id>35209d1c0f801300bc87ba8ce1050e85</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-01-29 22:55:30</sys_updated_on>
+    </wf_condition_default>
+    <wf_condition_default action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Create Resilient Incident">81fa49580f801300bc87ba8ce1050e0b</activity_definition>
+        <condition>activityOutput.resilientIncidentID != null</condition>
+        <derived_definition/>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <name>Success</name>
+        <order>100</order>
+        <short_description>Resilient Incident Created</short_description>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-01-29 22:51:56</sys_created_on>
+        <sys_id>6cfe499c0f401300bc87ba8ce1050e80</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-01-29 22:55:30</sys_updated_on>
+    </wf_condition_default>
+</record_update>

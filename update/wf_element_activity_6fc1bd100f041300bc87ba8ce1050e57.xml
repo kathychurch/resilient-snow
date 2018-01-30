@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="wf_element_activity">
+    <wf_element_activity action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <attributes/>
+        <base_provider display_value="Run Script">d0c7fe11eb013100fc5e8a7af106fee0</base_provider>
+        <category>Resilient Orchestration</category>
+        <checked_out_by/>
+        <default_height/>
+        <default_width/>
+        <description>Add new row to ServiceNow data table in Resilient</description>
+        <image>images/edittsk_tsk.gif</image>
+        <input_meta>{"name":"Input","type":"DATA_OBJECT","properties":[{"name":"resilientIncidentID","type":"STRING","mandatory":true},{"name":"resilientTaskID","type":"STRING","mandatory":false},{"name":"servicenowTable","type":"STRING","mandatory":true},{"name":"servicenowSysID","type":"STRING","mandatory":true}]}</input_meta>
+        <input_process_script/>
+        <input_transform/>
+        <local_variables/>
+        <name>Add To Resilient Data Table</name>
+        <output_meta/>
+        <output_process_script/>
+        <output_transform/>
+        <processing_script><![CDATA[// Add Entry for Ticket in Resilient Datatable
+resilientClient = new ResilientAPI();
+
+gs.debug("INPUTS TO RESILIENT UPDATE:  table: " + activityInput.servicenowTable + "  sysid: " + activityInput.servicenowSysID + "  inc_id: " + activityInput.resilientIncidentID + "  task_id:" + activityInput.resilientTaskID);
+
+var current = new GlideRecord(activityInput.servicenowTable);
+var sysID = activityInput.servicenowSysID;
+current.get(sysID);
+
+var incID = activityInput.resilientIncidentID;
+var taskID = activityInput.resilientTaskID ? activityInput.resilientTaskID : null;
+	
+var tableRow = {
+	"snow_resilient_task_id": taskID,
+	"snow_ticket_number": current.getValue("number"),
+	"snow_short_description": current.getValue("short_description"),
+	"snow_status": current.getDisplayValue("state"),
+	"snow_ticket_sys_id": current.getValue("sys_id"),
+	"snow_table_name": current.getTableName()
+};
+var newRow = resilientClient.addDataTableRow(incID, "servicenow_tickets", tableRow);]]></processing_script>
+        <sample_payloads>{}</sample_payloads>
+        <short_description>Add row to Resilient Data Table</short_description>
+        <style/>
+        <sys_class_name>wf_element_activity</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-01-30 01:22:28</sys_created_on>
+        <sys_id>6fc1bd100f041300bc87ba8ce1050e57</sys_id>
+        <sys_mod_count>12</sys_mod_count>
+        <sys_name>Add To Resilient Data Table</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>wf_element_activity_6fc1bd100f041300bc87ba8ce1050e57</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-01-30 19:44:31</sys_updated_on>
+        <version_container_id>d13275100f041300bc87ba8ce1050e69</version_container_id>
+    </wf_element_activity>
+    <sys_translated_text action="delete_multiple" query="documentkey=6fc1bd100f041300bc87ba8ce1050e57"/>
+    <wf_versionable action="INSERT_OR_UPDATE">
+        <checked_out/>
+        <checked_out_by/>
+        <published>true</published>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-01-30 01:22:28</sys_created_on>
+        <sys_id>993275100f041300bc87ba8ce1050e69</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-01-30 19:44:31</sys_updated_on>
+        <valid_from>2018-01-30 19:44:31</valid_from>
+        <valid_to/>
+        <version>1</version>
+        <version_container_id>d13275100f041300bc87ba8ce1050e69</version_container_id>
+        <wf_element_definition display_value="Add To Resilient Data Table">6fc1bd100f041300bc87ba8ce1050e57</wf_element_definition>
+    </wf_versionable>
+</record_update>

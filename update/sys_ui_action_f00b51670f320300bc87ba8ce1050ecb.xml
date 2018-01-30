@@ -41,6 +41,17 @@
 (function() {
 	action.setRedirectURL(current);
 	try{
+		var wf = new global.Workflow();
+		
+		vars = {
+			"u_servicenow_table": current.class_name,
+			"u_servicenow_sysid": current.sys_id,
+			"u_mapping_script_number": "RES0001001",
+			"u_resilientidfield": "u_resilient_id"
+		};
+		wf.startFlow(wf.getWorkflowFromName("CreateIncidentFromTicket"), current, null, vars);
+		gs.addInfoMessage("Resilient incident creation workflow has started");
+		/*
 		var className = gs.getProperty("x_166541_ibm_resil.ResilientCreatorClass");
 		if (!className){
 			throw "ResilientCreatorClass property not set";
@@ -48,6 +59,7 @@
 		var CreatorClass = stringToFunction(className);
 		var creator = new CreatorClass();
 		inc = creator.createIncident(current);
+ 		*/
 	}
 	catch (ex){
 		gs.addInfoMessage("Failed to Create Resilient Incident: " + ex.toString());
@@ -66,7 +78,7 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>f00b51670f320300bc87ba8ce1050ecb</sys_id>
-        <sys_mod_count>49</sys_mod_count>
+        <sys_mod_count>54</sys_mod_count>
         <sys_name>Create Resilient Incident</sys_name>
         <sys_overrides/>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
@@ -74,7 +86,7 @@
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_ui_action_f00b51670f320300bc87ba8ce1050ecb</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-10 17:28:17</sys_updated_on>
+        <sys_updated_on>2018-01-30 20:37:13</sys_updated_on>
         <table>incident</table>
         <ui11_compatible>true</ui11_compatible>
         <ui16_compatible>true</ui16_compatible>
