@@ -8,47 +8,21 @@
         <enforce_acl/>
         <http_method>POST</http_method>
         <name>Create Ticket</name>
-        <operation_script><![CDATA[function stringToFunction(str) {
-	var arr = str.split(".");
-	
-	var fn = this;
-	for (var i = 0, len = arr.length; i < len; i++) {
-		fn = fn[arr[i]];
-	}
-	
-	if (typeof fn !== "function") {
-		throw new Error("function not found");
-	}
-	
-	return  fn;
-}
-
-(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+        <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
 	var message = request.body.data;
+	var result;
 	
 	try{
-		var className = gs.getProperty("x_166541_ibm_resil.ResilientHandlerClass");
-		if (!className){
-			response.setStatus(400);
-			result = {
-				"message": "ResilientHandlerClass property not set"
-			};
-		}
-		else{
-			var HandlerClass = stringToFunction(className);
-			var handler = new HandlerClass();
-			result = handler.create(message);
-			if (typeof result === "string"){
-				// an error message
-				response.setStatus(400);
-				result = {
-					"message": "Failed to create ticket. " + result
-				};
-			}
-			else{
-				response.setStatus(201);
-			}
-		}
+		var wf = new global.Workflow();
+		var resilientJSON = new global.JSON().encode(message);
+		vars = {
+			"u_resilient_message": resilientJSON.toString(),
+			"u_mapping_spec_name": "Resilient to SNow Incident"
+		};
+		wf.startFlow(wf.getWorkflowFromName("CreateTicketFromResilient"), null, null, vars);
+		
+		result = {"message": "success"};
+		response.setStatus(201);
 	}
 	catch (ex){
 		response.setStatus(500);
@@ -70,14 +44,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-12-01 16:01:54</sys_created_on>
         <sys_id>edea7b050fb60300bc87ba8ce1050e20</sys_id>
-        <sys_mod_count>19</sys_mod_count>
+        <sys_mod_count>31</sys_mod_count>
         <sys_name>Create Ticket</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_ws_operation_edea7b050fb60300bc87ba8ce1050e20</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-12 01:39:46</sys_updated_on>
+        <sys_updated_on>2018-01-31 23:38:54</sys_updated_on>
         <web_service_definition display_value="Resilient Notification">19e733c10fb60300bc87ba8ce1050e33</web_service_definition>
         <web_service_version display_value="v1">ce483f850ff20300bc87ba8ce1050e3a</web_service_version>
     </sys_ws_operation>

@@ -9,16 +9,67 @@
         <default_height/>
         <default_width/>
         <description>Create a new ticket in Service Now from a Resilient Incident or Task</description>
-        <image>images/heisenberg_icons/workflow_ie8/provider_runscript.png</image>
+        <image>images/links_view.gif</image>
         <input_meta>{"name":"Input","type":"DATA_OBJECT","properties":[{"name":"resilientJSON","type":"STRING","mandatory":true},{"name":"mappingSpecName","type":"STRING","mandatory":true}]}</input_meta>
         <input_process_script/>
         <input_transform/>
         <local_variables/>
-        <name>Create Service Now Ticket</name>
-        <output_meta>{"name":"Output","type":"DATA_OBJECT","properties":[{"name":"servicenowTable","type":"STRING"},{"name":"servicenowSysID","type":"STRING"}]}</output_meta>
+        <name>Create Ticket From Resilient</name>
+        <output_meta>{"name":"Output","type":"DATA_OBJECT","properties":[{"name":"servicenowTable","type":"STRING"},{"name":"servicenowSysID","type":"STRING"},{"name":"resilientIncidentID","type":"STRING"},{"name":"resilientTaskID","type":"STRING"}]}</output_meta>
         <output_process_script/>
         <output_transform/>
-        <processing_script/>
+        <processing_script><![CDATA[var mappingGR = new GlideRecord("x_166541_ibm_resil_resilientrecord");
+mappingGR.get("name", activityInput.mappingSpecName);
+var resilientIDField = mappingGR.resilient_id_field;
+var tableName = mappingGR.servicenow_table;
+
+var parser = new global.JSON();
+
+//var message = activityInput.resilientJSON;
+var message = parser.decode(activityInput.resilientJSON);
+resilientClient = new ResilientAPI();
+var incID = message.incident.id;
+var taskID;
+var resilientID = incID.toString();
+
+// Re-Request so we get non-html versions of fields
+message.incident = resilientClient.getIncident(incID);
+if (message.task){
+	// Create Ticket from Task
+	taskID = message.task.id;
+	// re-request for non-html versions of fields
+	message.task = resilientClient.getTask(taskID);
+	resilientID = resilientID + "." + taskID.toString();
+}
+
+var gr = new GlideRecord(tableName);
+
+var evaluator = new GlideScopedEvaluator();
+
+//converting JSON back to string because servicenow will otherwise pass null as the value.  Why is this??
+var vars = {
+	"gr": gr,
+	"message": parser.encode(message) 
+};
+
+if (resilientIDField){
+		//store Resilient ID to Field in Ticket
+		gr.setValue(resilientIDField, resilientID);
+}
+
+evaluator.evaluateScript(mappingGR, "u_mapping_script", vars);
+
+var sysID = gr.insert();
+
+var errorMessage = gr.getLastErrorMessage();
+if (errorMessage){
+	throw errorMessage;
+}
+
+activityOutput.servicenowSysID = sysID;
+activityOutput.servicenowTable = tableName;
+activityOutput.resilientIncidentID = incID.toString();
+activityOutput.resilientTaskID = taskID ? taskID.toString() : null;]]></processing_script>
         <sample_payloads>{}</sample_payloads>
         <short_description>Create a new ticket from Resilient data</short_description>
         <style/>
@@ -26,14 +77,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-01-31 02:45:46</sys_created_on>
         <sys_id>d17ec7e40f405300bc87ba8ce1050ef2</sys_id>
-        <sys_mod_count>1</sys_mod_count>
-        <sys_name>Create Service Now Ticket</sys_name>
+        <sys_mod_count>29</sys_mod_count>
+        <sys_name>Create Ticket From Resilient</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy/>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>wf_element_activity_d17ec7e40f405300bc87ba8ce1050ef2</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-31 17:10:39</sys_updated_on>
+        <sys_updated_on>2018-01-31 23:36:07</sys_updated_on>
         <version_container_id>2fde0b640f405300bc87ba8ce1050ed6</version_container_id>
     </wf_element_activity>
     <sys_translated_text action="delete_multiple" query="documentkey=d17ec7e40f405300bc87ba8ce1050ef2"/>
@@ -51,6 +102,44 @@
         <valid_to/>
         <version>1</version>
         <version_container_id>2fde0b640f405300bc87ba8ce1050ed6</version_container_id>
-        <wf_element_definition display_value="Create Service Now Ticket">d17ec7e40f405300bc87ba8ce1050ef2</wf_element_definition>
+        <wf_element_definition display_value="Create Ticket From Resilient">d17ec7e40f405300bc87ba8ce1050ef2</wf_element_definition>
     </wf_versionable>
+    <wf_condition_default action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Create Ticket From Resilient">d17ec7e40f405300bc87ba8ce1050ef2</activity_definition>
+        <condition>activityOutput.servicenowSysID != null</condition>
+        <derived_definition/>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <name>Success</name>
+        <order>100</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-01-31 19:46:55</sys_created_on>
+        <sys_id>0ad57a300f801300bc87ba8ce1050e8d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-01-31 19:46:55</sys_updated_on>
+    </wf_condition_default>
+    <wf_condition_default action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Create Ticket From Resilient">d17ec7e40f405300bc87ba8ce1050ef2</activity_definition>
+        <condition/>
+        <derived_definition/>
+        <else_flag>true</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <name>Failure</name>
+        <order>200</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-01-31 19:46:55</sys_created_on>
+        <sys_id>8568fe300f801300bc87ba8ce1050e15</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-01-31 19:46:55</sys_updated_on>
+    </wf_condition_default>
 </record_update>
