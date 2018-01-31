@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="wf_element_activity">
+    <wf_element_activity action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <attributes/>
+        <base_provider display_value="Run Script">d0c7fe11eb013100fc5e8a7af106fee0</base_provider>
+        <category>Resilient Orchestration</category>
+        <checked_out_by display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</checked_out_by>
+        <default_height/>
+        <default_width/>
+        <description>Make a note on the ticket with a link to the Resilient Incident and store the incident ID if a field exists.</description>
+        <image>images/edittsk_tsk.gif</image>
+        <input_meta>{"name":"Input","type":"DATA_OBJECT","properties":[{"name":"resilientIDField","type":"STRING","mandatory":false},{"name":"resilientIncidentID","type":"STRING","mandatory":true},{"name":"resilientTaskID","type":"STRING","mandatory":false},{"name":"servicenowTable","type":"STRING","mandatory":true},{"name":"servicenowSysID","type":"STRING","mandatory":true}]}</input_meta>
+        <input_process_script/>
+        <input_transform/>
+        <local_variables/>
+        <name>Update ServiceNow Ticket</name>
+        <output_meta/>
+        <output_process_script/>
+        <output_transform/>
+        <processing_script><![CDATA[// Update ServiceNow ticket with Details of task or incident created
+// Add a worknote to the Service Now Ticket with link to new Incident/Task
+gs.info("INPUTS TO SNOW UPDATE idfield: " + activityInput.resilientIDField + "  table: " + activityInput.servicenowTable + "  sysid: " + activityInput.servicenowSysID + "  inc_id: " + activityInput.resilientIncidentID + "  task_id: " + activityInput.resilientTaskID);
+resilientClient = new ResilientAPI();
+var incID = activityInput.resilientIncidentID;
+var taskID = activityInput.resilientTaskID;
+var id = incID;
+
+var current = new GlideRecord(activityInput.servicenowTable);
+var sysID = activityInput.servicenowSysID;
+current.get(sysID);
+
+var url = resilientClient.baseURL + "/#incidents/" + incID;
+if (taskID){
+	id = incID + "." + taskID;
+	url = url + "?tab=81fcccb8-abc7-45fd-b7e9-2e494e7be849&task_id=" + taskID;
+	current.work_notes = "Created Resilient Task " + taskID + " on Incident "+ incID + " from this ticket. " + url;
+}
+else{
+	current.work_notes = "Created Resilient Incident " + incID + " from this ticket. " + url;
+}
+
+// Store Resilient Incident (and Task) ID to field in ticket
+if (activityInput.resilientIDField){
+	current.setValue(activityInput.resilientIDField, id);
+}
+
+current.update();]]></processing_script>
+        <sample_payloads>{}</sample_payloads>
+        <short_description>Update ServiceNow Ticket With Incident Info</short_description>
+        <style/>
+        <sys_class_name>wf_element_activity</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-01-30 22:56:55</sys_created_on>
+        <sys_id>0b7a12e00fcc1300bc87ba8ce1050e39</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>Update ServiceNow Ticket</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>wf_element_activity_0b7a12e00fcc1300bc87ba8ce1050e39</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-01-30 23:08:43</sys_updated_on>
+        <version_container_id>735459dc0f801300bc87ba8ce1050e16</version_container_id>
+    </wf_element_activity>
+    <sys_translated_text action="delete_multiple" query="documentkey=0b7a12e00fcc1300bc87ba8ce1050e39"/>
+    <wf_versionable action="INSERT_OR_UPDATE">
+        <checked_out>2018-01-30 22:56:55</checked_out>
+        <checked_out_by display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</checked_out_by>
+        <published>false</published>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-01-30 22:56:55</sys_created_on>
+        <sys_id>d77a9e640fcc1300bc87ba8ce1050e55</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-01-30 22:56:55</sys_updated_on>
+        <valid_from/>
+        <valid_to/>
+        <version>3</version>
+        <version_container_id>735459dc0f801300bc87ba8ce1050e16</version_container_id>
+        <wf_element_definition display_value="Update ServiceNow Ticket">0b7a12e00fcc1300bc87ba8ce1050e39</wf_element_definition>
+    </wf_versionable>
+    <wf_versionable action="update_multiple" query="version_container_id=735459dc0f801300bc87ba8ce1050e16^sys_id!=d77a9e640fcc1300bc87ba8ce1050e55^version&lt;3">
+        <published>false</published>
+    </wf_versionable>
+    <wf_activity action="update_multiple" is_dot_walk_query="true" query="workflow_version.published=true^activity_definition.version_container_id=735459dc0f801300bc87ba8ce1050e16">
+        <new_activity_definition>0b7a12e00fcc1300bc87ba8ce1050e39</new_activity_definition>
+        <out_of_date>true</out_of_date>
+        <notes>There is a newer version of this activity.
+
+To update the activity, check out the workflow, select the activity, right click
+and select 'Update activity' to use the latest version, then publish the workflow</notes>
+    </wf_activity>
+</record_update>

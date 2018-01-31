@@ -28,17 +28,17 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>d40e53560faf0300bc87ba8ce1050efa</sys_id>
-        <sys_mod_count>1</sys_mod_count>
-        <sys_name>ResilientMappings</sys_name>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>ResilientMappingScripts</sys_name>
         <sys_overrides/>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy/>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_app_module_d40e53560faf0300bc87ba8ce1050efa</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-30 04:11:46</sys_updated_on>
+        <sys_updated_on>2018-01-30 20:42:39</sys_updated_on>
         <timeline_page/>
-        <title>ResilientMappings</title>
+        <title>ResilientMappingScripts</title>
         <uncancelable>false</uncancelable>
         <view_name/>
         <window_name/>
