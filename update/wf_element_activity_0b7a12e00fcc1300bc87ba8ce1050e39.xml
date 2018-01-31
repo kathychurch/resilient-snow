@@ -10,17 +10,23 @@
         <default_width/>
         <description>Make a note on the ticket with a link to the Resilient Incident and store the incident ID if a field exists.</description>
         <image>images/edittsk_tsk.gif</image>
-        <input_meta>{"name":"Input","type":"DATA_OBJECT","properties":[{"name":"resilientIDField","type":"STRING","mandatory":false},{"name":"resilientIncidentID","type":"STRING","mandatory":true},{"name":"resilientTaskID","type":"STRING","mandatory":false},{"name":"servicenowTable","type":"STRING","mandatory":true},{"name":"servicenowSysID","type":"STRING","mandatory":true}]}</input_meta>
+        <input_meta>{"name":"Input","type":"DATA_OBJECT","properties":[{"name":"resilientIncidentID","type":"STRING","mandatory":true},{"name":"resilientTaskID","type":"STRING","mandatory":false},{"name":"servicenowTable","type":"STRING","mandatory":true},{"name":"servicenowSysID","type":"STRING","mandatory":true},{"name":"mappingSpecName","type":"STRING","mandatory":false}]}</input_meta>
         <input_process_script/>
         <input_transform/>
         <local_variables/>
-        <name>Update ServiceNow Ticket</name>
+        <name>Save Resilient ID</name>
         <output_meta/>
         <output_process_script/>
         <output_transform/>
         <processing_script><![CDATA[// Update ServiceNow ticket with Details of task or incident created
 // Add a worknote to the Service Now Ticket with link to new Incident/Task
-gs.info("INPUTS TO SNOW UPDATE idfield: " + activityInput.resilientIDField + "  table: " + activityInput.servicenowTable + "  sysid: " + activityInput.servicenowSysID + "  inc_id: " + activityInput.resilientIncidentID + "  task_id: " + activityInput.resilientTaskID);
+gs.info("INPUTS TO SNOW UPDATE mapping: " + activityInput.mappingSpecName + "  table: " + activityInput.servicenowTable + "  sysid: " + activityInput.servicenowSysID + "  inc_id: " + activityInput.resilientIncidentID + "  task_id: " + activityInput.resilientTaskID);
+
+var mappingGR = new GlideRecord("x_166541_ibm_resil_resilientrecord");
+mappingGR.get("name", activityInput.mappingSpecName);
+var resilientIDField = mappingGR.resilient_id_field;
+gs.info("Save Resilient ID to " + resilientIDField);
+
 resilientClient = new ResilientAPI();
 var incID = activityInput.resilientIncidentID;
 var taskID = activityInput.resilientTaskID;
@@ -41,8 +47,8 @@ else{
 }
 
 // Store Resilient Incident (and Task) ID to field in ticket
-if (activityInput.resilientIDField){
-	current.setValue(activityInput.resilientIDField, id);
+if (resilientIDField){
+	current.setValue(resilientIDField, id);
 }
 
 current.update();]]></processing_script>
@@ -53,14 +59,14 @@ current.update();]]></processing_script>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-01-30 22:56:55</sys_created_on>
         <sys_id>0b7a12e00fcc1300bc87ba8ce1050e39</sys_id>
-        <sys_mod_count>3</sys_mod_count>
-        <sys_name>Update ServiceNow Ticket</sys_name>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>Save Resilient ID</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy/>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>wf_element_activity_0b7a12e00fcc1300bc87ba8ce1050e39</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-30 23:08:43</sys_updated_on>
+        <sys_updated_on>2018-01-31 17:42:32</sys_updated_on>
         <version_container_id>735459dc0f801300bc87ba8ce1050e16</version_container_id>
     </wf_element_activity>
     <sys_translated_text action="delete_multiple" query="documentkey=0b7a12e00fcc1300bc87ba8ce1050e39"/>
@@ -78,7 +84,7 @@ current.update();]]></processing_script>
         <valid_to/>
         <version>3</version>
         <version_container_id>735459dc0f801300bc87ba8ce1050e16</version_container_id>
-        <wf_element_definition display_value="Update ServiceNow Ticket">0b7a12e00fcc1300bc87ba8ce1050e39</wf_element_definition>
+        <wf_element_definition display_value="Save Resilient ID">0b7a12e00fcc1300bc87ba8ce1050e39</wf_element_definition>
     </wf_versionable>
     <wf_versionable action="update_multiple" query="version_container_id=735459dc0f801300bc87ba8ce1050e16^sys_id!=d77a9e640fcc1300bc87ba8ce1050e55^version&lt;3">
         <published>false</published>

@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database>
     <element label="ResilientMapping" max_length="40" name="x_166541_ibm_resil_resilientrecord" type="collection">
-        <element attributes="ignore_filter_on_new=true" default="javascript:global.getNextObjNumberPadded();" label="Number" max_length="40" name="number" type="string"/>
+        <element label="Name" mandatory="true" max_length="200" name="name" type="string" unique="true"/>
+        <element attributes="ignore_filter_on_new=true" default="javascript:global.getNextObjNumberPadded();" label="Number" max_length="40" name="number" read_only="true" type="string"/>
+        <element default="u_resilient_id" label="Resilient ID Field" max_length="40" name="resilient_id_field" type="string"/>
+        <element default="incident" label="ServiceNow Table" mandatory="true" max_length="60" name="servicenow_table" type="table_name"/>
         <element label="Description" max_length="300" name="u_mapping_description" type="string"/>
         <element label="Mapping Script" max_length="20000" name="u_mapping_script" type="script_plain"/>
+        <index name="index">
+            <element name="name"/>
+        </index>
     </element>
 </database>

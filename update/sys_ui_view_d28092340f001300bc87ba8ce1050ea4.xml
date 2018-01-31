@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ui_view">
+    <sys_ui_view action="INSERT_OR_UPDATE">
+        <group/>
+        <hidden>false</hidden>
+        <name>resilent_mappings</name>
+        <roles/>
+        <sys_class_name>sys_ui_view</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-01-31 16:51:56</sys_created_on>
+        <sys_id>d28092340f001300bc87ba8ce1050ea4</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Resilent Mappings</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>sys_ui_view_d28092340f001300bc87ba8ce1050ea4</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-01-31 16:51:56</sys_updated_on>
+        <title>Resilent Mappings</title>
+        <user/>
+    </sys_ui_view>
+</record_update>

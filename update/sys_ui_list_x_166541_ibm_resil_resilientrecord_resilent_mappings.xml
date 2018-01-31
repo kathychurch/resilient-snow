@@ -1,50 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <record_update>
-    <sys_ui_list parent="" relationship="" sys_domain="global" table="x_166541_ibm_resil_resilientrecord" version="2" view="sys_ref_list">
+    <sys_ui_list parent="" relationship="" sys_domain="global" table="x_166541_ibm_resil_resilientrecord" version="2" view="resilent_mappings">
         <sys_ui_list_element action="INSERT_OR_UPDATE">
             <average_value>false</average_value>
             <element>name</element>
-            <list_id display_value="x_166541_ibm_resil_resilientrecord" element="NULL" name="x_166541_ibm_resil_resilientrecord" parent="NULL" relationship="NULL" sys_domain="global" view="5c962341dd2003003399d83d70be026c">5a61de380f001300bc87ba8ce1050ee8</list_id>
+            <list_id display_value="x_166541_ibm_resil_resilientrecord" element="NULL" name="x_166541_ibm_resil_resilientrecord" parent="NULL" relationship="NULL" sys_domain="global" view="d28092340f001300bc87ba8ce1050ea4">13c112380f001300bc87ba8ce1050e40</list_id>
             <max_value>false</max_value>
             <min_value>false</min_value>
             <position>0</position>
             <sum>false</sum>
             <sys_created_by>admin</sys_created_by>
-            <sys_created_on>2018-01-31 16:55:45</sys_created_on>
-            <sys_id>de61de380f001300bc87ba8ce1050ee8</sys_id>
+            <sys_created_on>2018-01-31 16:57:28</sys_created_on>
+            <sys_id>97c112380f001300bc87ba8ce1050e40</sys_id>
             <sys_mod_count>0</sys_mod_count>
             <sys_updated_by>admin</sys_updated_by>
-            <sys_updated_on>2018-01-31 16:55:45</sys_updated_on>
+            <sys_updated_on>2018-01-31 16:57:28</sys_updated_on>
         </sys_ui_list_element>
         <sys_ui_list_element action="INSERT_OR_UPDATE">
             <average_value>false</average_value>
             <element>servicenow_table</element>
-            <list_id display_value="x_166541_ibm_resil_resilientrecord" element="NULL" name="x_166541_ibm_resil_resilientrecord" parent="NULL" relationship="NULL" sys_domain="global" view="5c962341dd2003003399d83d70be026c">5a61de380f001300bc87ba8ce1050ee8</list_id>
+            <list_id display_value="x_166541_ibm_resil_resilientrecord" element="NULL" name="x_166541_ibm_resil_resilientrecord" parent="NULL" relationship="NULL" sys_domain="global" view="d28092340f001300bc87ba8ce1050ea4">13c112380f001300bc87ba8ce1050e40</list_id>
             <max_value>false</max_value>
             <min_value>false</min_value>
             <position>1</position>
             <sum>false</sum>
             <sys_created_by>admin</sys_created_by>
-            <sys_created_on>2018-01-31 16:55:45</sys_created_on>
-            <sys_id>5261de380f001300bc87ba8ce1050ee9</sys_id>
+            <sys_created_on>2018-01-31 16:57:28</sys_created_on>
+            <sys_id>1bc112380f001300bc87ba8ce1050e40</sys_id>
             <sys_mod_count>0</sys_mod_count>
             <sys_updated_by>admin</sys_updated_by>
-            <sys_updated_on>2018-01-31 16:55:45</sys_updated_on>
+            <sys_updated_on>2018-01-31 16:57:28</sys_updated_on>
         </sys_ui_list_element>
         <sys_ui_list_element action="INSERT_OR_UPDATE">
             <average_value>false</average_value>
             <element>u_mapping_description</element>
-            <list_id display_value="x_166541_ibm_resil_resilientrecord" element="NULL" name="x_166541_ibm_resil_resilientrecord" parent="NULL" relationship="NULL" sys_domain="global" view="5c962341dd2003003399d83d70be026c">5a61de380f001300bc87ba8ce1050ee8</list_id>
+            <list_id display_value="x_166541_ibm_resil_resilientrecord" element="NULL" name="x_166541_ibm_resil_resilientrecord" parent="NULL" relationship="NULL" sys_domain="global" view="d28092340f001300bc87ba8ce1050ea4">13c112380f001300bc87ba8ce1050e40</list_id>
             <max_value>false</max_value>
             <min_value>false</min_value>
             <position>2</position>
             <sum>false</sum>
             <sys_created_by>admin</sys_created_by>
-            <sys_created_on>2018-01-31 16:55:45</sys_created_on>
-            <sys_id>d261de380f001300bc87ba8ce1050ee9</sys_id>
+            <sys_created_on>2018-01-31 16:57:28</sys_created_on>
+            <sys_id>9bc112380f001300bc87ba8ce1050e40</sys_id>
             <sys_mod_count>0</sys_mod_count>
             <sys_updated_by>admin</sys_updated_by>
-            <sys_updated_on>2018-01-31 16:55:45</sys_updated_on>
+            <sys_updated_on>2018-01-31 16:57:28</sys_updated_on>
         </sys_ui_list_element>
         <sys_ui_list action="INSERT_OR_UPDATE">
             <average_value>false</average_value>
@@ -58,20 +58,20 @@
             <sum>false</sum>
             <sys_class_name>sys_ui_list</sys_class_name>
             <sys_created_by>admin</sys_created_by>
-            <sys_created_on>2018-01-31 16:55:45</sys_created_on>
+            <sys_created_on>2018-01-31 16:57:28</sys_created_on>
             <sys_domain>global</sys_domain>
             <sys_domain_path>/</sys_domain_path>
-            <sys_id>5a61de380f001300bc87ba8ce1050ee8</sys_id>
+            <sys_id>13c112380f001300bc87ba8ce1050e40</sys_id>
             <sys_mod_count>0</sys_mod_count>
             <sys_name>x_166541_ibm_resil_resilientrecord</sys_name>
             <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
             <sys_policy/>
             <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
-            <sys_update_name>sys_ui_list_x_166541_ibm_resil_resilientrecord_sys_ref_list</sys_update_name>
+            <sys_update_name>sys_ui_list_x_166541_ibm_resil_resilientrecord_resilent_mappings</sys_update_name>
             <sys_updated_by>admin</sys_updated_by>
-            <sys_updated_on>2018-01-31 16:55:45</sys_updated_on>
+            <sys_updated_on>2018-01-31 16:57:28</sys_updated_on>
             <sys_user/>
-            <view display_value="Reference List" name="sys_ref_list">5c962341dd2003003399d83d70be026c</view>
+            <view display_value="Resilent Mappings" name="resilent_mappings">d28092340f001300bc87ba8ce1050ea4</view>
             <view_name/>
         </sys_ui_list>
     </sys_ui_list>

@@ -10,7 +10,7 @@
         <default_width/>
         <description>Create Resilient Task From Existing ServiceNow Ticket</description>
         <image>images/links_view.gif</image>
-        <input_meta>{"name":"Input","type":"DATA_OBJECT","properties":[{"name":"resilientIncidentID","type":"STRING","mandatory":true},{"name":"servicenowTable","type":"STRING","mandatory":true},{"name":"servicenowSysID","type":"STRING","mandatory":true},{"name":"mappingScriptNumber","type":"STRING","mandatory":true}]}</input_meta>
+        <input_meta>{"name":"Input","type":"DATA_OBJECT","properties":[{"name":"resilientIncidentID","type":"STRING","mandatory":true},{"name":"servicenowTable","type":"STRING","mandatory":true},{"name":"servicenowSysID","type":"STRING","mandatory":true},{"name":"mappingSpecName","type":"STRING","mandatory":true}]}</input_meta>
         <input_process_script/>
         <input_transform/>
         <local_variables/>
@@ -18,14 +18,14 @@
         <output_meta>{"name":"Output","type":"DATA_OBJECT","properties":[{"name":"resilientTaskID","type":"STRING"}]}</output_meta>
         <output_process_script/>
         <output_transform/>
-        <processing_script><![CDATA[gs.debug("CREATE TASK INPUTS  table: " + activityInput.servicenowTable + "  sysid: " + activityInput.servicenowSysID + "  inc_id: " + activityInput.resilientIncidentID + "  mapping: " + activityInput.mappingScriptNumber);
+        <processing_script><![CDATA[gs.debug("CREATE TASK INPUTS  table: " + activityInput.servicenowTable + "  sysid: " + activityInput.servicenowSysID + "  inc_id: " + activityInput.resilientIncidentID + "  mapping: " + activityInput.mappingSpecName);
 var gr = new GlideRecord(activityInput.servicenowTable);
 var sysID = activityInput.servicenowSysID;
 var incID = activityInput.resilientIncidentID;
 gr.get(sysID);
 
 var mappingGR = new GlideRecord("x_166541_ibm_resil_resilientrecord");
-mappingGR.get("number", activityInput.mappingScriptNumber);
+mappingGR.get("name", activityInput.mappingSpecName);
 
 var evaluator = new GlideScopedEvaluator();
 var vars = {
@@ -44,14 +44,14 @@ activityOutput.resilientTaskID = task.id.toString();]]></processing_script>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-01-30 21:53:45</sys_created_on>
         <sys_id>58cb8ee80f8c1300bc87ba8ce1050e2a</sys_id>
-        <sys_mod_count>9</sys_mod_count>
+        <sys_mod_count>10</sys_mod_count>
         <sys_name>Create Resilient Task</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy/>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>wf_element_activity_58cb8ee80f8c1300bc87ba8ce1050e2a</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-30 23:32:15</sys_updated_on>
+        <sys_updated_on>2018-01-31 17:08:22</sys_updated_on>
         <version_container_id>350c4e640f8c1300bc87ba8ce1050e89</version_container_id>
     </wf_element_activity>
     <sys_translated_text action="delete_multiple" query="documentkey=58cb8ee80f8c1300bc87ba8ce1050e2a"/>

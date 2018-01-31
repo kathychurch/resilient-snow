@@ -15,10 +15,10 @@
         <choice/>
         <choice_field/>
         <choice_table/>
-        <column_label>Mapping Script Number</column_label>
+        <column_label>Mapping Spec</column_label>
         <comments/>
         <create_roles/>
-        <default_value>RES0001001</default_value>
+        <default_value>SNow Incident to Resilient Incident</default_value>
         <defaultsort/>
         <delete_roles/>
         <dependent/>
@@ -28,15 +28,15 @@
         <dynamic_creation_script/>
         <dynamic_default_value/>
         <dynamic_ref_qual/>
-        <element>u_mapping_script_number</element>
+        <element>u_mapping_spec_name</element>
         <element_reference>false</element_reference>
         <foreign_database/>
         <help/>
         <hint/>
         <internal_type display_value="String">string</internal_type>
-        <label>Mapping Script Number</label>
+        <label>Mapping Spec</label>
         <mandatory>true</mandatory>
-        <max_length>40</max_length>
+        <max_length>200</max_length>
         <model_id>2fa034df0f7b4300bc87ba8ce1050ecc</model_id>
         <model_table>wf_workflow</model_table>
         <name>var__m_var_dictionary_2fa034df0f7b4300bc87ba8ce1050ecc</name>
@@ -59,14 +59,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-01-29 23:06:10</sys_created_on>
         <sys_id>7a42959c0f801300bc87ba8ce1050ee5</sys_id>
-        <sys_mod_count>7</sys_mod_count>
-        <sys_name>Mapping Script Number</sys_name>
+        <sys_mod_count>11</sys_mod_count>
+        <sys_name>Mapping Spec</sys_name>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
         <sys_policy/>
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>var_dictionary_7a42959c0f801300bc87ba8ce1050ee5</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-30 04:30:20</sys_updated_on>
+        <sys_updated_on>2018-01-31 17:37:59</sys_updated_on>
         <table_reference>false</table_reference>
         <text_index>false</text_index>
         <unique>false</unique>

@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <record_update>
-    <sys_documentation element="u_resilientidfield" label="Resilient ID Field" language="en" table="var__m_var_dictionary_285fca6c0f8c1300bc87ba8ce1050ef8">
+    <sys_documentation element="resilient_id_field" label="Resilient ID Field" language="en" table="x_166541_ibm_resil_resilientrecord">
         <sys_documentation action="INSERT_OR_UPDATE">
-            <element>u_resilientidfield</element>
+            <element>resilient_id_field</element>
             <help/>
             <hint/>
             <label>Resilient ID Field</label>
             <language>en</language>
-            <name>var__m_var_dictionary_285fca6c0f8c1300bc87ba8ce1050ef8</name>
-            <plural>Resilient ID Field</plural>
+            <name>x_166541_ibm_resil_resilientrecord</name>
+            <plural>Resilient ID Fields</plural>
             <sys_class_name>sys_documentation</sys_class_name>
             <sys_created_by>admin</sys_created_by>
-            <sys_created_on>2018-01-30 22:10:05</sys_created_on>
-            <sys_id>9dcf0aac0f8c1300bc87ba8ce1050e94</sys_id>
+            <sys_created_on>2018-01-31 16:24:07</sys_created_on>
+            <sys_id>ba2acef00f001300bc87ba8ce1050ee8</sys_id>
             <sys_mod_count>0</sys_mod_count>
             <sys_name>Resilient ID Field</sys_name>
             <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
             <sys_policy/>
             <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
-            <sys_update_name>sys_documentation_var__m_var_dictionary_285fca6c0f8c1300bc87ba8ce1050ef8_u_resilientidfield_en</sys_update_name>
+            <sys_update_name>sys_documentation_x_166541_ibm_resil_resilientrecord_resilient_id_field_en</sys_update_name>
             <sys_updated_by>admin</sys_updated_by>
-            <sys_updated_on>2018-01-30 22:10:05</sys_updated_on>
+            <sys_updated_on>2018-01-31 16:24:07</sys_updated_on>
             <url/>
             <url_target/>
         </sys_documentation>
