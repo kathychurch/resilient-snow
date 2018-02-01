@@ -34,13 +34,28 @@
         <rest_variables/>
         <role_conditions/>
         <script><![CDATA[(function executeRule(current, previous /*null when async*/) {
-
+	
 	var resilientClient = new ResilientAPI();
 	var inc = resilientClient.getIncident(current.u_resilient_id);
-	var updates = {"plan_status": "C",
-				  "resolution_summary": current.close_notes ? current.close_notes.getDisplayValue() : "ServiceNow Ticket Closed",
-				  "resolution_id": "Resolved"};
+	var updates = {
+		"plan_status": "C",
+		"resolution_summary": current.close_notes ? current.close_notes.getDisplayValue() : "ServiceNow Ticket Closed",
+		"resolution_id": "Resolved"
+	};
 	resilientClient.updateIncident(inc, updates);
+	
+	var dtUpdates = {
+		"snow_status": current.state.getDisplayValue()
+	};
+	var conditions = {
+		"snow_resilient_task_id": null
+	};
+	var rows = resilientClient.getDataTableRows(parseInt(current.u_resilient_id), "servicenow_tickets", conditions);
+	gs.info("Got " + rows.length + " rows");
+	if (rows.length == 1){
+		var row = rows[0];
+		resilientClient.updateDataTableRow(current.u_resilient_id, "servicenow_tickets", row, dtUpdates);
+	}
 })(current, previous);]]></script>
         <sys_class_name>sys_script</sys_class_name>
         <sys_created_by>admin</sys_created_by>
@@ -48,7 +63,7 @@
         <sys_domain>global</sys_domain>
         <sys_domain_path>/</sys_domain_path>
         <sys_id>537520390feb0300bc87ba8ce1050eac</sys_id>
-        <sys_mod_count>2</sys_mod_count>
+        <sys_mod_count>5</sys_mod_count>
         <sys_name>Resilient_Close_Incident</sys_name>
         <sys_overrides/>
         <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
@@ -56,7 +71,7 @@
         <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
         <sys_update_name>sys_script_537520390feb0300bc87ba8ce1050eac</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-01-09 17:40:37</sys_updated_on>
+        <sys_updated_on>2018-02-01 03:03:55</sys_updated_on>
         <template/>
         <when>async</when>
     </sys_script>

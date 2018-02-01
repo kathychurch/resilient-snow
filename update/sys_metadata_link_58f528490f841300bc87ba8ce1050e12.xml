@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_metadata_link">
+    <sys_metadata_link action="INSERT_OR_UPDATE">
+        <directory>update</directory>
+        <documentkey>8e4a88850f441300bc87ba8ce1050e89</documentkey>
+        <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;record_update table="x_166541_ibm_resil_resilientrecord"&gt;
+    &lt;x_166541_ibm_resil_resilientrecord action="INSERT_OR_UPDATE"&gt;
+        &lt;name&gt;Comment From Resilient&lt;/name&gt;
+        &lt;number&gt;RES0001008&lt;/number&gt;
+        &lt;resilient_id_field&gt;u_resilient_id&lt;/resilient_id_field&gt;
+        &lt;servicenow_table&gt;incident&lt;/servicenow_table&gt;
+        &lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;
+        &lt;sys_created_on&gt;2018-02-01 01:44:52&lt;/sys_created_on&gt;
+        &lt;sys_id&gt;8e4a88850f441300bc87ba8ce1050e89&lt;/sys_id&gt;
+        &lt;sys_mod_count&gt;1&lt;/sys_mod_count&gt;
+        &lt;sys_updated_by&gt;admin&lt;/sys_updated_by&gt;
+        &lt;sys_updated_on&gt;2018-02-01 01:59:37&lt;/sys_updated_on&gt;
+        &lt;u_mapping_description&gt;Add a comment to an existing ticket from a Resilient Note&lt;/u_mapping_description&gt;
+        &lt;u_mapping_script&gt;&lt;![CDATA[message = new global.JSON().decode(message);
+gr.comments = message.note.text;]]&gt;&lt;/u_mapping_script&gt;
+    &lt;/x_166541_ibm_resil_resilientrecord&gt;
+&lt;/record_update&gt;
+</payload>
+        <sys_class_name>sys_metadata_link</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-02-01 03:44:42</sys_created_on>
+        <sys_id>58f528490f841300bc87ba8ce1050e12</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Comment From Resilient</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>sys_metadata_link_58f528490f841300bc87ba8ce1050e12</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-02-01 03:44:42</sys_updated_on>
+        <tablename>x_166541_ibm_resil_resilientrecord</tablename>
+    </sys_metadata_link>
+</record_update>

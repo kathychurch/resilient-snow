@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="wf_element_activity">
+    <wf_element_activity action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <attributes/>
+        <base_provider display_value="Run Script">d0c7fe11eb013100fc5e8a7af106fee0</base_provider>
+        <category>Resilient Orchestration</category>
+        <checked_out_by display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</checked_out_by>
+        <default_height/>
+        <default_width/>
+        <description>Prefix Ticket Number on Incident or Task Name</description>
+        <image>images/method_call_marker.gif</image>
+        <input_meta>{"name":"Input","type":"DATA_OBJECT","properties":[{"name":"resilientIncidentID","type":"STRING","mandatory":true},{"name":"resilientTaskID","type":"STRING","mandatory":false},{"name":"ticketNumber","type":"STRING","mandatory":true}]}</input_meta>
+        <input_process_script/>
+        <input_transform/>
+        <local_variables/>
+        <name>Add Number To Resilient Name</name>
+        <output_meta/>
+        <output_process_script/>
+        <output_transform/>
+        <processing_script><![CDATA[var resilientClient = new ResilientAPI();
+
+if (activityInput.resilientTaskID){
+	//Prefix task name with ticket number
+	var taskID = activityInput.resilientTaskID;
+	var task = resilientClient.getTask(taskID);
+	var updates = {
+		"name": "[" + activityInput.ticketNumber + "] " + task.name
+	};
+	resilientClient.updateTask(taskID, updates);
+}
+else {
+	//Prefix incident name with ticket number
+	var incID = activityInput.resilientIncidentID;
+	var incident = resilientClient.getIncident(incID);
+	updates = {
+		"name": "[" + activityInput.ticketNumber + "] " + incident.name
+	};
+	resilientClient.updateIncident(incident, updates);
+}]]></processing_script>
+        <sample_payloads>{}</sample_payloads>
+        <short_description>Prefix Ticket Number to Name</short_description>
+        <style/>
+        <sys_class_name>wf_element_activity</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-02-01 02:27:16</sys_created_on>
+        <sys_id>b873dcc90f441300bc87ba8ce1050e79</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>Add Number To Resilient Name</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>wf_element_activity_b873dcc90f441300bc87ba8ce1050e79</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-02-01 02:34:26</sys_updated_on>
+        <version_container_id>8e3454c90f441300bc87ba8ce1050eec</version_container_id>
+    </wf_element_activity>
+    <sys_translated_text action="delete_multiple" query="documentkey=b873dcc90f441300bc87ba8ce1050e79"/>
+    <wf_versionable action="INSERT_OR_UPDATE">
+        <checked_out>2018-02-01 02:27:16</checked_out>
+        <checked_out_by display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</checked_out_by>
+        <published>false</published>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-02-01 02:27:16</sys_created_on>
+        <sys_id>4a3454c90f441300bc87ba8ce1050eed</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-02-01 02:27:16</sys_updated_on>
+        <valid_from/>
+        <valid_to/>
+        <version>1</version>
+        <version_container_id>8e3454c90f441300bc87ba8ce1050eec</version_container_id>
+        <wf_element_definition display_value="Add Number To Resilient Name">b873dcc90f441300bc87ba8ce1050e79</wf_element_definition>
+    </wf_versionable>
+</record_update>

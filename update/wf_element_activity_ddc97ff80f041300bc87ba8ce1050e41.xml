@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="wf_element_activity">
+    <wf_element_activity action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <attributes/>
+        <base_provider display_value="Run Script">d0c7fe11eb013100fc5e8a7af106fee0</base_provider>
+        <category>Resilient Orchestration</category>
+        <checked_out_by display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</checked_out_by>
+        <default_height/>
+        <default_width/>
+        <description>Update an existing ServiceNow ticket with data from Resilient incident or task</description>
+        <image>images/method_call_marker.gif</image>
+        <input_meta>{"name":"Input","type":"DATA_OBJECT","properties":[{"name":"resilientJSON","type":"STRING","mandatory":true},{"name":"mappingSpecName","type":"STRING","mandatory":true}]}</input_meta>
+        <input_process_script/>
+        <input_transform/>
+        <local_variables/>
+        <name>Update Ticket From Resilient</name>
+        <output_meta>{"name":"Output","type":"DATA_OBJECT","properties":[]}</output_meta>
+        <output_process_script/>
+        <output_transform/>
+        <processing_script><![CDATA[var resilientClient = new ResilientAPI();
+
+var mappingGR = new GlideRecord("x_166541_ibm_resil_resilientrecord");
+mappingGR.get("name", activityInput.mappingSpecName);
+var tableName = mappingGR.servicenow_table;
+
+var parser = new global.JSON();
+
+var message = parser.decode(activityInput.resilientJSON);
+resilientClient = new ResilientAPI();
+var incID = message.incident ? message.incident.id : null;
+var taskID = message.task ? message.task.id : null;
+if (message.note){
+	incID = message.note.inc_id;
+	taskID = message.note.task_id;
+}
+
+var gr = getTicketToUpdate(incID, taskID);
+
+// Re-Request so we get non-html versions of fields
+if (message.incident){
+	message.incident = resilientClient.getIncident(incID);
+}
+if (message.task){
+	// Create Ticket from Task
+	// re-request for non-html versions of fields
+	message.task = resilientClient.getTask(taskID);
+}
+
+if (message.note){
+	// re-request for non-html versions of fields
+	if (taskID){
+		message.note = resilientClient.getTaskNote(taskID, message.note.id);
+	}
+	else{
+		message.note = resilientClient.getIncidentNote(incID, message.note.id);
+	}
+}
+
+var evaluator = new GlideScopedEvaluator();
+
+//converting JSON back to string because servicenow will otherwise pass null as the value.  Why is this??
+var vars = {
+	"gr": gr,
+	"message": parser.encode(message)
+};
+
+evaluator.evaluateScript(mappingGR, "u_mapping_script", vars);
+
+gr.update();
+
+var errorMessage = gr.getLastErrorMessage();
+if (errorMessage){
+	throw errorMessage;
+}
+
+function getTicketToUpdate(incID, taskID){
+	// Match a Resilient Incident/Task up to an existing ServiceNow Ticket
+	
+	var conditions = {
+		"snow_resilient_task_id": taskID
+	};
+	var rows = resilientClient.getDataTableRows(incID, "servicenow_tickets", conditions);
+	if (rows.length == 0 && taskID){
+		// Try again without task ID
+		conditions = {
+			"snow_resilient_task_id": null
+		};
+		rows = this.resilientClient.getDataTableRows(incID, "servicenow_tickets", conditions);
+	}
+	if (rows.length == 0){
+		throw("Couldn't find ticket for Resilient Incident.Task " + incID + "." + taskID);
+	}
+	else if (rows.length > 1){
+		throw("Resilient Incident.Task linked to multiple tickets" + incID + "." + taskID);
+	}
+	var sysID = rows[0].cells.snow_ticket_sys_id.value;
+	var tableName = rows[0].cells.snow_table_name.value;
+	var gr = new GlideRecord(tableName);
+	gr.get(sysID);
+	return gr;
+}
+
+]]></processing_script>
+        <sample_payloads>{}</sample_payloads>
+        <short_description>Update a ServiceNow Ticket </short_description>
+        <style/>
+        <sys_class_name>wf_element_activity</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-02-01 00:33:06</sys_created_on>
+        <sys_id>ddc97ff80f041300bc87ba8ce1050e41</sys_id>
+        <sys_mod_count>9</sys_mod_count>
+        <sys_name>Update Ticket From Resilient</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>wf_element_activity_ddc97ff80f041300bc87ba8ce1050e41</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-02-01 02:13:10</sys_updated_on>
+        <version_container_id>f91afff00f041300bc87ba8ce1050eb2</version_container_id>
+    </wf_element_activity>
+    <sys_translated_text action="delete_multiple" query="documentkey=ddc97ff80f041300bc87ba8ce1050e41"/>
+    <wf_versionable action="INSERT_OR_UPDATE">
+        <checked_out>2018-02-01 00:33:06</checked_out>
+        <checked_out_by display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</checked_out_by>
+        <published>false</published>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-02-01 00:33:06</sys_created_on>
+        <sys_id>b11a333c0f041300bc87ba8ce1050e8c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-02-01 00:33:06</sys_updated_on>
+        <valid_from/>
+        <valid_to/>
+        <version>1</version>
+        <version_container_id>f91afff00f041300bc87ba8ce1050eb2</version_container_id>
+        <wf_element_definition display_value="Update Ticket From Resilient">ddc97ff80f041300bc87ba8ce1050e41</wf_element_definition>
+    </wf_versionable>
+</record_update>

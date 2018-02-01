@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_metadata_link">
+    <sys_metadata_link action="INSERT_OR_UPDATE">
+        <directory>update</directory>
+        <documentkey>2baf373c0f041300bc87ba8ce1050eef</documentkey>
+        <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;record_update table="x_166541_ibm_resil_resilientrecord"&gt;
+    &lt;x_166541_ibm_resil_resilientrecord action="INSERT_OR_UPDATE"&gt;
+        &lt;name&gt;Resilient Update SNow Incident&lt;/name&gt;
+        &lt;number&gt;RES0001007&lt;/number&gt;
+        &lt;resilient_id_field&gt;u_resilient_id&lt;/resilient_id_field&gt;
+        &lt;servicenow_table&gt;incident&lt;/servicenow_table&gt;
+        &lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;
+        &lt;sys_created_on&gt;2018-02-01 00:58:57&lt;/sys_created_on&gt;
+        &lt;sys_id&gt;2baf373c0f041300bc87ba8ce1050eef&lt;/sys_id&gt;
+        &lt;sys_mod_count&gt;4&lt;/sys_mod_count&gt;
+        &lt;sys_updated_by&gt;admin&lt;/sys_updated_by&gt;
+        &lt;sys_updated_on&gt;2018-02-01 01:43:11&lt;/sys_updated_on&gt;
+        &lt;u_mapping_description&gt;Update an Existing Serivce Now Incident from a Resilient Message&lt;/u_mapping_description&gt;
+        &lt;u_mapping_script&gt;&lt;![CDATA[message = new global.JSON().decode(message);
+if(message.incident.plan_status == "C"){
+	gr.state = 6;
+	gr.work_notes = "Resilient Incident " + incID + " has closed.\n" + "Resolution ID: " + message.incident.resolution_id + "\nResolution Summary: " + message.incident.resolution_summary;
+}
+if(message.task &amp;&amp; message.task.status == "C"){
+	gr.state = 6;
+	gr.work_notes = "Resilient Incident " + incID + " Task " + taskID +" has closed. ";
+}
+]]&gt;&lt;/u_mapping_script&gt;
+    &lt;/x_166541_ibm_resil_resilientrecord&gt;
+&lt;/record_update&gt;
+</payload>
+        <sys_class_name>sys_metadata_link</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-02-01 03:44:42</sys_created_on>
+        <sys_id>9cf528490f841300bc87ba8ce1050e0d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Resilient Update SNow Incident</sys_name>
+        <sys_package display_value="IBM Resilient" source="x_166541_ibm_resil">23e3da820f120300bc87ba8ce1050e97</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="IBM Resilient">23e3da820f120300bc87ba8ce1050e97</sys_scope>
+        <sys_update_name>sys_metadata_link_9cf528490f841300bc87ba8ce1050e0d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-02-01 03:44:42</sys_updated_on>
+        <tablename>x_166541_ibm_resil_resilientrecord</tablename>
+    </sys_metadata_link>
+</record_update>
